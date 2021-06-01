@@ -336,7 +336,7 @@ export default {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     onRedirectToWhatsapp() {
-      const url = `https://api.whatsapp.com/send?phone=${this.contact.whatsappNumber}&text=%20${this.whatsappMessage}`;
+      const url = `https://api.whatsapp.com/send?phone=${this.contact.whatsappNumber}&text=%20${encodeURI(this.whatsappMessage)}`;
       window.open(url, "_blank");
     },
   },
