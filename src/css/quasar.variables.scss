@@ -1,0 +1,91 @@
+// Quasar SCSS (& Sass) Variables
+// --------------------------------------------------
+// To customize the look and feel of this app, you can override
+// the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
+
+// Check documentation for full list of Quasar variables
+
+// Your own variables (that are declared here) and Quasar's own
+// ones will be available out of the box in your .vue/.scss/.sass files
+
+// It's highly recommended to change the default colors
+// to match your app's branding.
+// Tip: Use the "Theme Builder" on Quasar's documentation website.
+
+// *default quasar vars
+$space-base: 12px !default;
+
+$primary: #00cb81;
+$secondary: #4d7abd;
+$accent: #ff7d7d;
+
+$dark: #1d1d1d;
+
+$positive: #21ba45;
+$negative: #c10015;
+$info: #31ccec;
+$warning: #f2c037;
+//
+
+// * layout
+$footerHeight: 50px;
+$headerHeight: 50px;
+
+// * text
+$normalTextFontSize: 16px;
+$smallTextFontSize: 13px;
+$vsmallTextFontSize: 11px;
+
+// * headlines
+$h1FontSize: 30px;
+$h2FontSize: 28px;
+$h3FontSize: 26px;
+$h4FontSize: 22px;
+$h5FontSize: 18px;
+$h6FontSize: 16px;
+
+// * borders
+$basicBorderSize: 1px;
+$selectedElementBorderSize: 1px;
+$basicBorderColor: #0000001f;
+$lightBorderColor: #efefef;
+$basicBorderRadius: 10px;
+// $generic-border-radius: $basicBorderRadius !default;
+// $button-push-border-radius: $basicBorderRadius !default;
+
+// * dots colors
+$d1: #ffc600;
+
+// * margin
+$marginLeftRight1: 10px;
+$marginLeftRight2: 20px;
+$marginLeftRight3: 30px;
+$marginLeftRight4: 40px;
+$marginLeftRight5: 50px;
+$marginLeftRight6: 60px;
+$marginLeftRight7: 70px;
+
+$marginBottom1: 10px;
+$marginBottom2: 20px;
+$marginBottom3: 30px;
+$marginBottom4: 40px;
+$marginBottom5: 50px;
+$marginBottom6: 60px;
+$marginBottom7: 70px;
+$marginBottom8: 80px;
+$marginBottom9: 90px;
+$marginBottom10: 100px;
+
+$marginTop1: 10px;
+$marginTop2: 20px;
+$marginTop3: 30px;
+$marginTop4: 40px;
+$marginTop5: 50px;
+$marginTop6: 60px;
+$marginTop7: 70px;
+$marginTop8: 80px;
+$marginTop9: 90px;
+$marginTop10: 100px;
+
+// * plugins
+$notifyClassicFontSize: 25px;
