@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex q-px-sm">
+  <q-page class="flex">
     <q-header>
       <q-toolbar>
         <q-toolbar-title> Travel Agent </q-toolbar-title>
@@ -24,22 +24,25 @@
 
     <div v-if="tab === 'info'" class="full-width">
       <section class="q-mt-xl">
-        <h5>contacts</h5>
-        <q-input v-model="contact.whatsappNumber" label="contact WhatsApp" />
-        <q-separator class="sep" color="secondary" spaced inset />
+        <h5
+          class="bg-secondary text-white text-center q-mt-xl q-py-sm q-mb-lg"
+          style="opacity: 0.73"
+        >
+          contacts
+        </h5>
+        <q-input
+          class="q-mb-xl q-px-sm"
+          v-model="data.whatsappNumber"
+          label="contact WhatsApp"
+        />
 
         <div
-          style="
-            overflow-x: auto;
-            flex: nowrap;
-            display: flex;
-            max-width: 250px;
-          "
-          class="q-mt-xl items-center"
+          style="overflow-x: auto; flex: nowrap; display: flex; max-width: 100%"
+          class="items-center q-px-sm"
         >
           <div
             class="q-mr-md"
-            v-for="(traveler, idx) in contact.travelers"
+            v-for="(traveler, idx) in data.travelers"
             :key="idx"
           >
             <div
@@ -56,11 +59,18 @@
                 @click="onRemoveTraveler(idx)"
               />
             </div>
-            <q-input v-model="contact.travelers[idx].name" label="name" />
-            <q-option-group
+            <q-input
+              class="q-mb-md"
+              v-model="data.travelers[idx].name"
+              label="name"
+            />
+            <q-select
+              class="q-mb-md"
+              filled
+              v-model="data.travelers[idx].type"
+              emit-value
               :options="travelerTypes"
-              type="radio"
-              v-model="contact.travelers[idx].type"
+              label="Filled"
             />
           </div>
           <q-btn
@@ -71,32 +81,41 @@
           />
         </div>
       </section>
-      <q-separator class="sep" color="secondary" spaced inset />
+      <h5
+        class="bg-secondary text-white text-center q-py-sm q-mb-lg"
+        style="opacity: 0.73; margin-top: 48px"
+      >
+        amadeus code
+      </h5>
       <section class="">
         <q-input
-          v-model="contact.amadeusCode"
+          v-model="data.amadeusCode"
           filled
           autogrow
           placeholder="amadeus code"
         />
       </section>
-      <q-separator class="sep" color="secondary" spaced inset />
 
       <section class="">
         <div
           class="q-mt-xl"
-          v-for="(items, boxName, indxx) in formStructure"
+          v-for="(items, boxName) in formStructure"
           :key="boxName"
         >
-          <h5>{{ boxName }}</h5>
+          <h5
+            class="bg-secondary text-white text-center q-py-sm q-mb-lg"
+            style="opacity: 0.73; margin-top: 48px"
+          >
+            {{ boxName }}
+          </h5>
           <div
-            class="q-mt-md"
+            class="q-mt-md q-px-sm"
             v-for="(item, index) in items"
             :key="item"
             :class="[index === 0 ? 'q-mt-md' : 'q-mt-xl']"
           >
             <h6>{{ item }}</h6>
-            <div v-for="(option, idx) in contact[boxName][item]" :key="idx">
+            <div v-for="(option, idx) in data[boxName][item]" :key="idx">
               <q-input
                 v-if="option.type === 'input'"
                 class="q-mt-sm"
@@ -116,16 +135,15 @@
               />
             </div>
           </div>
-          <q-separator
-            v-if="indxx !== Object.keys(formStructure).length - 1"
-            class="sep"
-            color="secondary"
-            spaced
-            inset
-          />
         </div>
       </section>
-      <q-separator class="sep" color="secondary" spaced inset />
+      <h5
+        class="bg-secondary text-white text-center q-py-sm q-mb-lg"
+        style="opacity: 0.73; margin-top: 48px"
+      >
+        Language
+      </h5>
+
       <q-option-group :options="langs" type="radio" v-model="selectedLang" />
     </div>
     <div class="full-width q-mt-xl q-px-sm" v-else>
@@ -157,7 +175,12 @@ import {
   PRICE_MAY_CHANGE,
   PLEASE_PAY_AGAIN_MSG_EN,
   FAREWELL,
+  ADULT,
   CHILD,
+  YOUTH,
+  STUDENT,
+  SENIOR,
+  INFANT,
   PRICES,
   RESTRICTIONS,
 } from "src/assets/consts.js";
@@ -169,31 +192,49 @@ export default {
     return {
       tab: "info",
       travelerTypes: [
-        { label: "adult", value: "adult", color: "blue" },
-        { label: "child", value: "child" },
+        { label: "adlut", value: "adlut", color: "primary" },
+        { label: "senior", value: "senior", color: "secondary" },
+        { label: "student", value: "student", color: "accent" },
+        { label: "youth", value: "youth", color: "yellow" },
+        { label: "child", value: "child", color: "green" },
+        { label: "infant", value: "infant", color: "pink" },
       ],
       langs: [
-        { label: "english", value: "en" },
-        { label: "french", value: "fr" },
+        { label: "English", value: "en" },
+        { label: "French", value: "fr" },
       ],
       selectedLang: "en",
       formStructure: {
-        prices: ["price", "restrictions"],
+        prices: ["price", "currancy", "restrictions"],
         details: ["baggage", "food"],
       },
       selectedBagges: [],
-      contact: {
+      data: {
         whatsappNumber: null,
-        travelers: [{ name: "", type: "adult" }],
+        travelers: [{ name: "", type: "adlut" }],
         // ! debug
-        // amadeusCode:
-        //   "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        amadeusCode: "",
+        amadeusCode:
+          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
+        // amadeusCode: "",
         prices: {
           price: {
-            priceAdult: { label: "Adult", value: 0, type: "input" },
-            priceChild: { label: "Child", value: 0, type: "input" },
-            feePercantage: { label: "Fee percentage", value: 0, type: "input" },
+            adlut: { label: "adlut", value: 0, type: "input" },
+            senior: { label: "senior", value: 0, type: "input" },
+            student: { label: "student", value: 0, type: "input" },
+            youth: { label: "youth", value: 0, type: "input" },
+            child: { label: "child", value: 0, type: "input" },
+            infant: { label: "infant", value: 0, type: "input" },
+          },
+          currancy: {
+            currancy: {
+              options: [
+                { label: "$", value: "$" },
+                { label: "€", value: "€" },
+                { label: "₪", value: "₪" },
+              ],
+              selected: "$",
+              type: "radio",
+            },
           },
           restrictions: {
             changeFee: { label: "Change fee", value: 0, type: "input" },
@@ -234,13 +275,13 @@ export default {
   },
   methods: {
     onAddTraveler() {
-      this.contact.travelers.push({
+      this.data.travelers.push({
         name: "",
-        type: "adult",
+        type: "adlut",
       });
     },
     onRemoveTraveler(idx) {
-      this.contact.travelers = this.contact.travelers.filter(
+      this.data.travelers = this.data.travelers.filter(
         (traveler, index) => index !== idx
       );
     },
@@ -281,81 +322,113 @@ export default {
         destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
         destDate = `${splited[10]}`;
 
-        return `${
-          FLIGHT[this.selectedLang]
-        } ${way} \n${airline}-(${flightNumber}) \n${this.departAirport}>${
-          this.destAirport
-        } \n${departDate} ${departTime} - ${destDate} ${destTime} \n`;
+        return `${way} \n${airline}-(${flightNumber}) \n${this.departAirport} - ${this.destAirport} \nDpt. ${departDate} ${departTime}  \nArr. ${destDate} ${destTime} \n`;
       }
     },
     onPreview() {
       let amadeusSplittedLines, departTxt, destTxt, otherTravelers;
 
-      amadeusSplittedLines = this.contact.amadeusCode.split("\n");
+      amadeusSplittedLines = this.data.amadeusCode.split("\n");
       departTxt = this.getAmadeusTranslate("ALLER", amadeusSplittedLines[0]);
       destTxt = this.getAmadeusTranslate("RETOUR", amadeusSplittedLines[1]);
 
-      otherTravelers = this.contact.travelers
+      otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
         .map((traveler) => this.capitalizeFirstLetter(traveler.name))
         .join(", ");
 
       this.whatsappMessage = `${this.capitalizeFirstLetter(
-        this.contact.travelers[0].name
-      )}, Shalom! \n\n${FLIGHT_DESC[this.selectedLang]} \n${
+        this.data.travelers[0].name
+      )}, Shalom! \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.destAirport}>${
         this.destAirport
-      }>${this.destAirport}>${this.destAirport} \n${
-        this.contact.travelers.length >= 2
-          ? `together with ${otherTravelers}`
-          : ""
+      }>${this.destAirport} \n${
+        this.data.travelers.length >= 2 ? `together with ${otherTravelers}` : ""
       } \n\n${
         PLEASE_PAY_MSG_EN[this.selectedLang]
       } \n\n*Itinerary:* \n${departTxt} \n${destTxt}
-\n\n*${PRICES[this.selectedLang]}:* \n${
-        this.contact.prices.price.priceAdult.value
-      }$ x ${this.amountsOfadults} adults \n${
-        this.contact.prices.price.priceChild.value
-      }$ x ${this.amountsOfchilds} ${CHILD[this.selectedLang]}
- \ntotal: ${this.totalPrice}$ \n\n*${
+\n\n*${PRICES[this.selectedLang]}:* \n${this.priceDetails} \n\n*${
         RESTRICTIONS[this.selectedLang]
-      }:* \nChange: ${
-        this.contact.prices.restrictions.changeFee.value
-      }$ \nCancel: ${
-        this.contact.prices.restrictions.cancelFee.value
-      }$ \nNo show: ${
-        this.contact.prices.restrictions.noShowFee.value
-      }$ \n\n*Details:* \n-Compartment: None \n-Baggage: ${
+      }:* \nChange: ${this.data.prices.restrictions.changeFee.value}${
+        this.selectedCurrancy
+      } \nCancel: ${this.data.prices.restrictions.cancelFee.value}${
+        this.selectedCurrancy
+      } \nNo show: ${this.data.prices.restrictions.noShowFee.value}${
+        this.selectedCurrancy
+      } \n\n*Details:* \n-Compartment: None \n-Baggage: ${
         this.totalBaggage
-      } \n-Meal: ${
-        this.contact.details.food.food.selected
-      } \n\n*Attention:* \n${PRICE_MAY_CHANGE[this.selectedLang]} \n\n${
-        PLEASE_PAY_AGAIN_MSG_EN[this.selectedLang]
-      } \n\n${FAREWELL[this.selectedLang]}      `;
+      } \n-Meal: ${this.data.details.food.food.selected} \n\n*Attention:* \n${
+        PRICE_MAY_CHANGE[this.selectedLang]
+      } \n\n${PLEASE_PAY_AGAIN_MSG_EN[this.selectedLang]} \n\n${
+        FAREWELL[this.selectedLang]
+      }      `;
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     onRedirectToWhatsapp() {
-      const url = `https://api.whatsapp.com/send?phone=${this.contact.whatsappNumber}&text=%20${encodeURI(this.whatsappMessage)}`;
+      const url = `https://api.whatsapp.com/send?phone=${
+        this.data.whatsappNumber
+      }&text=%20${encodeURI(this.whatsappMessage)}`;
       window.open(url, "_blank");
+    },
+    getAmountOfSpecificTraveler(travelerType) {
+      return this.data.travelers.filter((tr) => tr.type === travelerType)
+        .length;
     },
   },
   computed: {
-    amountsOfadults() {
-      return this.contact.travelers.filter((tr) => tr.type === "adult").length;
+    selectedCurrancy() {
+      return this.data.prices.currancy.currancy.selected;
     },
-    amountsOfchilds() {
-      return this.contact.travelers.filter((tr) => tr.type === "child").length;
+    travelersTypeAmountMap() {
+      let travelersTypeAmountMap = {};
+      this.data.travelers.forEach((traveler) => {
+        console.log(traveler.type);
+        if (travelersTypeAmountMap[traveler.type])
+          ++travelersTypeAmountMap[traveler.type];
+        else travelersTypeAmountMap[traveler.type] = 1;
+      });
+      return travelersTypeAmountMap;
     },
     totalPrice() {
-      let total;
-      total = this.contact.prices.price.priceAdult.value * this.amountsOfadults;
-      total +=
-        this.contact.prices.price.priceChild.value * this.amountsOfchilds;
+      let total = 0;
+      for (const key in this.travelersTypeAmountMap) {
+        total +=
+          this.travelersTypeAmountMap[key] * this.data.prices.price[key].value;
+      }
       return total;
     },
     totalBaggage() {
-      return this.contact.details.baggage.baggage.selected.join(", ");
+      return this.data.details.baggage.baggage.selected.join(", ");
+    },
+    priceDetails() {
+      let priceTxt = ``,
+        passanger;
+      for (const key in this.travelersTypeAmountMap) {
+        switch (key) {
+          case "adult":
+            passanger = ADULT[this.selectedLang];
+            break;
+          case "child":
+            passanger = CHILD[this.selectedLang];
+            break;
+          case "youth":
+            passanger = YOUTH[this.selectedLang];
+            break;
+          case "student":
+            passanger = STUDENT[this.selectedLang];
+            break;
+          case "senior":
+            passanger = SENIOR[this.selectedLang];
+            break;
+          case "infant":
+            passanger = INFANT[this.selectedLang];
+            break;
+        }
+        priceTxt += `${this.data.prices.price[key].value}${this.selectedCurrancy} x ${this.travelersTypeAmountMap[key]} ${passanger} \n`;
+      }
+      priceTxt += `\ntotal: ${this.totalPrice}${this.selectedCurrancy}`;
+      return priceTxt;
     },
   },
 };
