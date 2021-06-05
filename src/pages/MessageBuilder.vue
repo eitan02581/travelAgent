@@ -213,9 +213,9 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adlut" }],
         // ! debug
-        amadeusCode:
-          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        // amadeusCode: "",
+        // amadeusCode:
+          // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
+        amadeusCode: "",
         prices: {
           price: {
             adlut: { label: "adlut", value: 0, type: "input" },
