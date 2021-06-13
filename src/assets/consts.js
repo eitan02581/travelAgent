@@ -77,7 +77,7 @@ export const CHANGE_RESTRICTION = {
 
 export const ADULT = {
     'en': "Adult",
-    'fr': "Adulte:"
+    'fr': "Adulte"
     , 'he': ''
 }
 

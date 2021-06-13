@@ -24,18 +24,17 @@
 
     <div v-if="tab === 'info'" class="full-width">
       <section class="q-mt-xl">
-        <h5
-          class="bg-secondary text-white text-center q-mt-xl q-py-sm q-mb-lg"
-          style="opacity: 0.73"
-        >
-          contacts
-        </h5>
         <q-input
           class="q-mb-xl q-px-sm"
           v-model="data.whatsappNumber"
           label="contact WhatsApp"
         />
-
+        <h5
+          class="bg-secondary text-white text-center q-mt-xl q-py-sm q-mb-lg"
+          style="opacity: 0.73"
+        >
+          travelers
+        </h5>
         <div
           style="overflow-x: auto; flex: nowrap; display: flex; max-width: 100%"
           class="items-center q-px-sm"
@@ -87,14 +86,23 @@
       >
         amadeus code
       </h5>
-      <section class="">
+      <div class="q-px-sm">
+        <h6 class="q-mb-sm">Outbound flights</h6>
         <q-input
-          v-model="data.amadeusCode"
+          class="q-mb-lg"
+          v-model="data.outboundAmadeusCode"
           filled
           autogrow
-          placeholder="amadeus code"
+          placeholder="Outbound amadeus code"
         />
-      </section>
+        <h6 class="q-mb-sm">Inbound flights</h6>
+        <q-input
+          v-model="data.inboundAmadeusCode"
+          filled
+          autogrow
+          placeholder="Inbound amadeus code"
+        />
+      </div>
 
       <section class="">
         <div
@@ -171,6 +179,7 @@ import {
   PLEASE_PAY_MSG_EN,
   FLIGHT,
   ALLER,
+  DAYS,
   RETOUR,
   PRICE_MAY_CHANGE,
   PLEASE_PAY_AGAIN_MSG_EN,
@@ -185,14 +194,14 @@ import {
   RESTRICTIONS,
 } from "src/assets/consts.js";
 
-import { airlines } from "src/assets/airlines.js";
-import { airports } from "src/assets/airport_filtered.js";
+import { airlines } from "src/assets/airlines_big.js";
+import index from "airportsjs";
 export default {
   data() {
     return {
       tab: "info",
       travelerTypes: [
-        { label: "adlut", value: "adlut", color: "primary" },
+        { label: "adult", value: "adult", color: "primary" },
         { label: "senior", value: "senior", color: "secondary" },
         { label: "student", value: "student", color: "accent" },
         { label: "youth", value: "youth", color: "yellow" },
@@ -211,14 +220,17 @@ export default {
       selectedBagges: [],
       data: {
         whatsappNumber: null,
-        travelers: [{ name: "", type: "adlut" }],
+        travelers: [{ name: "", type: "adult" }],
         // ! debug
         // amadeusCode:
-          // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        amadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
+        outboundAmadeusCode:
+          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        inboundAmadeusCode:
+          "7  AA 1551 M 29JUN 2 LASMIA HK2  2347 0729  30JUN  E  AA/GGLEEY",
         prices: {
           price: {
-            adlut: { label: "adlut", value: 0, type: "input" },
+            adult: { label: "adult", value: 0, type: "input" },
             senior: { label: "senior", value: 0, type: "input" },
             student: { label: "student", value: 0, type: "input" },
             youth: { label: "youth", value: 0, type: "input" },
@@ -271,13 +283,14 @@ export default {
       whatsappMessage: "",
       departAirport: null,
       destAirport: null,
+      journey: [],
     };
   },
   methods: {
     onAddTraveler() {
       this.data.travelers.push({
         name: "",
-        type: "adlut",
+        type: "adult",
       });
     },
     onRemoveTraveler(idx) {
@@ -285,52 +298,68 @@ export default {
         (traveler, index) => index !== idx
       );
     },
-    getAmadeusTranslate(direction, line) {
-      let splited,
-        way,
-        airline,
-        flightNumber,
-        departDate,
-        departAirportCode,
-        destAirportCode,
-        departTime,
-        destTime,
-        destDate;
-
-      if (line) {
-        splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-
+    getAmadeusTranslate(direction, linesString) {
+      if (linesString.length) {
+        let lines,
+          splited,
+          way,
+          airline,
+          flightNumber,
+          departDate,
+          departAirportCode,
+          destAirportCode,
+          departAirport,
+          destAirport,
+          departTime,
+          destTime,
+          destDate,
+          dayNumber,
+          txt = "";
         way =
           direction === "ALLER"
             ? ALLER[this.selectedLang]
             : RETOUR[this.selectedLang];
+        lines = linesString.split("\n");
+        lines.forEach((line, idx) => {
+          if (!line) return;
+          splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
+          airline = airlines.filter((item) => {
+            return item.IATA === splited[1];
+          })[0].name;
+          flightNumber = `${splited[1]}${splited[2]}`;
+          departDate = `${splited[4]}`;
+          dayNumber = splited[5];
+          departAirportCode = splited[6].slice(0, 3);
+          destAirportCode = splited[6].slice(3, 6);
+          this.journey.push(index.lookupByIataCode(departAirportCode).city);
+          this.journey.push(index.lookupByIataCode(destAirportCode).city);
+          departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
+          destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
 
-        airline = airlines.filter((item) => item.iata === splited[1])[0].name;
-        flightNumber = `${splited[1]}${splited[2]}`;
-        departDate = `${splited[4]}`;
-        departAirportCode = splited[6].slice(0, 3);
-        this.departAirport = `${
-          airports.filter((air) => air.iata_code === departAirportCode)[0]
-            .municipality
-        }`;
-        destAirportCode = splited[6].slice(3, 6);
-        this.destAirport = `${
-          airports.filter((air) => air.iata_code === destAirportCode)[0]
-            .municipality
-        }`;
-        departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-        destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
-        destDate = `${splited[10]}`;
-
-        return `${way} \n${airline}-(${flightNumber}) \n${this.departAirport} - ${this.destAirport} \nDpt. ${departDate} ${departTime}  \nArr. ${destDate} ${destTime} \n`;
-      }
+          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
+          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
+          destDate = `${splited[10]}`;
+          txt += `\n${airline}-(${flightNumber}) \n${departAirport} - ${destAirport} \nDpt. ${departDate} ${
+            DAYS[this.selectedLang][dayNumber - 1]
+          } ${departTime}  \nArr. ${destDate} ${
+            DAYS[this.selectedLang][dayNumber]
+          } ${destTime} \n`;
+        });
+        return `${way} ${txt}`;
+      } else return "";
     },
     onPreview() {
-      let amadeusSplittedLines, departTxt, destTxt, otherTravelers;
+      let departTxt, destTxt, otherTravelers;
+      this.journey = [];
 
-      amadeusSplittedLines = this.data.amadeusCode.split("\n");
-      departTxt = this.getAmadeusTranslate("ALLER", amadeusSplittedLines[0]);
-      destTxt = this.getAmadeusTranslate("RETOUR", amadeusSplittedLines[1]);
+      departTxt = this.getAmadeusTranslate(
+        "ALLER",
+        this.data.outboundAmadeusCode
+      );
+      destTxt = this.getAmadeusTranslate(
+        "RETOUR",
+        this.data.inboundAmadeusCode
+      );
 
       otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
@@ -339,9 +368,9 @@ export default {
 
       this.whatsappMessage = `${this.capitalizeFirstLetter(
         this.data.travelers[0].name
-      )}, Shalom! \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.destAirport}>${
-        this.destAirport
-      }>${this.destAirport} \n${
+      )}, Shalom! 
+        \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.journeyTxt} \n
+      ${
         this.data.travelers.length >= 2 ? `together with ${otherTravelers}` : ""
       } \n\n${
         PLEASE_PAY_MSG_EN[this.selectedLang]
@@ -383,7 +412,6 @@ export default {
     travelersTypeAmountMap() {
       let travelersTypeAmountMap = {};
       this.data.travelers.forEach((traveler) => {
-        console.log(traveler.type);
         if (travelersTypeAmountMap[traveler.type])
           ++travelersTypeAmountMap[traveler.type];
         else travelersTypeAmountMap[traveler.type] = 1;
@@ -429,6 +457,14 @@ export default {
       }
       priceTxt += `\ntotal: ${this.totalPrice}${this.selectedCurrancy}`;
       return priceTxt;
+    },
+    journeyTxt() {
+      let txt = "";
+      this.journey.forEach(
+        (place, idx) =>
+          (txt += `${place} ${idx < this.journey.length - 1 ? "> " : ""}`)
+      );
+      return txt;
     },
   },
 };
