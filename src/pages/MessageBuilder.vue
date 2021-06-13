@@ -208,6 +208,24 @@ export default {
         { label: "child", value: "child", color: "green" },
         { label: "infant", value: "infant", color: "pink" },
       ],
+      classesTypeMap: {
+        "BUSINESS Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
+        "PREMIUM Cl.": ["W", "Q", "B", "P", "A"],
+        "ECONOMY Cl.": [
+          "Y",
+          "M",
+          "K",
+          "V",
+          "S",
+          "L",
+          "H",
+          "E",
+          "N",
+          "G",
+          "O",
+          "U",
+        ],
+      },
       langs: [
         { label: "English", value: "en" },
         { label: "French", value: "fr" },
@@ -224,10 +242,8 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode:
-          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
-        inboundAmadeusCode:
-          "7  AA 1551 M 29JUN 2 LASMIA HK2  2347 0729  30JUN  E  AA/GGLEEY",
+        outboundAmadeusCode: "",
+        inboundAmadeusCode: "",
         prices: {
           price: {
             adult: { label: "adult", value: 0, type: "input" },
@@ -369,9 +385,8 @@ export default {
       this.whatsappMessage = `${this.capitalizeFirstLetter(
         this.data.travelers[0].name
       )}, Shalom! 
-        \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.journeyTxt} \n
-      ${
-        this.data.travelers.length >= 2 ? `together with ${otherTravelers}` : ""
+        \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.journeyTxt}\n${
+        this.data.travelers.length >= 2 ? `Together with ${otherTravelers}` : ""
       } \n\n${
         PLEASE_PAY_MSG_EN[this.selectedLang]
       } \n\n*Itinerary:* \n${departTxt} \n${destTxt}
