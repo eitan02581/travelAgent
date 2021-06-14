@@ -6,9 +6,9 @@ export const DAYS = {
     'he': ['שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת', 'ראשון']
 }
 
-export const ALLER = { 'en': 'Outbound flight.', 'fr': 'Vol aller', 'he': 'טיסה הלוך' }
+export const ALLER = { 'en': 'Outbound flight(s) 🛫', 'fr': 'Vol aller', 'he': 'טיסה הלוך' }
 
-export const RETOUR = { 'en': 'Inbound flight.', 'fr': 'Vol retour', 'he': 'טיסה חזור' }
+export const RETOUR = { 'en': 'Inbound flight(s)  🛬', 'fr': 'Vol retour', 'he': 'טיסה חזור' }
 
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -76,14 +76,14 @@ export const CHANGE_RESTRICTION = {
 
 
 export const ADULT = {
-    'en': "Adult",
-    'fr': "Adulte"
+    'en': "Adult (+12)",
+    'fr': "Adulte (+12)"
     , 'he': ''
 }
 
 export const CHILD = {
-    'en': "Child",
-    'fr': "Enfant"
+    'en': "Child (+12)",
+    'fr': "Enfant (-12)"
     , 'he': ''
 }
 
@@ -106,7 +106,7 @@ export const SENIOR = {
 }
 
 export const INFANT = {
-    'en': "Infant",
-    'fr': "Bébé"
+    'en': "Infant (-2)",
+    'fr': "Bébé (-2)"
     , 'he': ''
 }

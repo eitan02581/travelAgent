@@ -233,7 +233,7 @@ export default {
       selectedLang: "en",
       formStructure: {
         prices: ["price", "currancy", "restrictions"],
-        details: ["baggage", "food"],
+        details: ["itinerary", "baggage", "food"],
       },
       selectedBagges: [],
       data: {
@@ -243,7 +243,9 @@ export default {
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
         outboundAmadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         inboundAmadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         prices: {
           price: {
             adult: { label: "adult", value: 0, type: "input" },
@@ -271,6 +273,17 @@ export default {
           },
         },
         details: {
+          itinerary: {
+            itinerary: {
+              options: [
+                { label: "One Way (O/W)", value: "One Way (O/W)" },
+                { label: "Round Trip (R/T)", value: "Round Trip (R/T)" },
+                { label: "Multi Destinations", value: "Multi Destinations" },
+              ],
+              selected: [],
+              type: "checkbox",
+            },
+          },
           baggage: {
             baggage: {
               options: [
@@ -302,7 +315,33 @@ export default {
       journey: [],
     };
   },
+  created() {
+    this.init();
+  },
   methods: {
+    init() {
+      if (!String.prototype.splice) {
+        /**
+         * {JSDoc}
+         *
+         * The splice() method changes the content of a string by removing a range of
+         * characters and/or adding new characters.
+         *
+         * @this {String}
+         * @param {number} start Index at which to start changing the string.
+         * @param {number} delCount An integer indicating the number of old chars to remove.
+         * @param {string} newSubStr The String that is spliced in.
+         * @return {string} A new string with the spliced substring.
+         */
+        String.prototype.splice = function (start, delCount, newSubStr) {
+          return (
+            this.slice(0, start) +
+            newSubStr +
+            this.slice(start + Math.abs(delCount))
+          );
+        };
+      }
+    },
     onAddTraveler() {
       this.data.travelers.push({
         name: "",
@@ -338,6 +377,9 @@ export default {
         lines = linesString.split("\n");
         lines.forEach((line, idx) => {
           if (!line) return;
+          line = line.splice(5, 0, " ");
+          line = line.splice(20, 1, " ");
+
           splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
           airline = airlines.filter((item) => {
             return item.IATA === splited[1];
@@ -355,7 +397,7 @@ export default {
           departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
           destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
           destDate = `${splited[10]}`;
-          txt += `\n${airline}-(${flightNumber}) \n${departAirport} - ${destAirport} \nDpt. ${departDate} ${
+          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${departDate} ${
             DAYS[this.selectedLang][dayNumber - 1]
           } ${departTime}  \nArr. ${destDate} ${
             DAYS[this.selectedLang][dayNumber]
@@ -387,9 +429,9 @@ export default {
       )}, Shalom! 
         \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.journeyTxt}\n${
         this.data.travelers.length >= 2 ? `Together with ${otherTravelers}` : ""
-      } \n\n${
-        PLEASE_PAY_MSG_EN[this.selectedLang]
-      } \n\n*Itinerary:* \n${departTxt} \n${destTxt}
+      } \n\n${PLEASE_PAY_MSG_EN[this.selectedLang]} \n\n*Itinerary:* ${
+        this.data.details.itinerary.itinerary.selected
+      } \n${departTxt} \n${destTxt}
 \n\n*${PRICES[this.selectedLang]}:* \n${this.priceDetails} \n\n*${
         RESTRICTIONS[this.selectedLang]
       }:* \nChange: ${this.data.prices.restrictions.changeFee.value}${
@@ -400,11 +442,11 @@ export default {
         this.selectedCurrancy
       } \n\n*Details:* \n-Compartment: None \n-Baggage: ${
         this.totalBaggage
-      } \n-Meal: ${this.data.details.food.food.selected} \n\n*Attention:* \n${
-        PRICE_MAY_CHANGE[this.selectedLang]
-      } \n\n${PLEASE_PAY_AGAIN_MSG_EN[this.selectedLang]} \n\n${
-        FAREWELL[this.selectedLang]
-      }      `;
+      } \n-Meal: ${
+        this.data.details.food.food.selected
+      } \n\n*Attention:* ❗ \n${PRICE_MAY_CHANGE[this.selectedLang]} \n\n${
+        PLEASE_PAY_AGAIN_MSG_EN[this.selectedLang]
+      } \n\n${FAREWELL[this.selectedLang]}      `;
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
