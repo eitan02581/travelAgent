@@ -1,7 +1,9 @@
 import enUS from './en-us'
-// import fr from './en-us'
-// import enUS from './en-us'
+import fr from './fr'
+import he from './he'
 
 export default {
-  'en-us': enUS
+  'en-us': enUS,
+  'fr': fr,
+  'he': he
 }

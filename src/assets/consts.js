@@ -1,112 +1,108 @@
-export const LANGAUGES = { 'en': 'English', 'fr': 'Francais', 'he': 'עברית' }
 
-export const DAYS = {
-    'en': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    'fr': ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-    'he': ['שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת', 'ראשון']
+export const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+export const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+
+export const TRAVELER_TYPES = [
+    { label: "adult", value: "adult", color: "primary" },
+    { label: "senior", value: "senior", color: "secondary" },
+    { label: "student", value: "student", color: "accent" },
+    { label: "youth", value: "youth", color: "yellow" },
+    { label: "child", value: "child", color: "green" },
+    { label: "infant", value: "infant", color: "pink" },
+]
+export const CLASSES_TYPE_MAP = {
+    "BUSINESS Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
+    "PREMIUM Cl.": ["W", "Q", "B", "P", "A"],
+    "ECONOMY Cl.": ["Y", "M", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
 }
+export const LANGS = [
+    { label: "English", value: "en" },
+    { label: "French", value: "fr" },
+]
 
-export const ALLER = { 'en': 'Outbound flight(s) 🛫', 'fr': 'Vol aller', 'he': 'טיסה הלוך' }
-
-export const RETOUR = { 'en': 'Inbound flight(s)  🛬', 'fr': 'Vol retour', 'he': 'טיסה חזור' }
-
-export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-export const ONE_WAY = { "en": 'O/w', 'fr': 'aller-simple', 'he': '' }
-
-export const ROUND_TRIP = { 'en': 'round-trip', 'fr': 'aller-retor', 'he': '' }
-
-export const TOGETHER = { 'en': 'together with', 'fr': 'avec', 'he': '' }
-
-export const ITINERARY = { 'en': 'Itinerary', 'fr': 'itinéraire', 'he': 'מסלול' }
-
-export const FLIGHT_DESC = {
-    'en': "As per your request you'll find below\nmy proposal for your upcoming flight",
-    'fr': "Suite à ta demande,tu trouveras ci-dessus\nma proposition pour le voyage"
-    , 'he': ''
-}
-
-export const FLIGHT = { 'en': 'Flight', 'fr': 'Vol', 'he': '' }
-export const SEAT = { 'en': 'Seat', 'fr': 'Siege', 'he': '' }
-export const MEAL = { 'en': 'Meal', 'fr': 'Repa', 'he': '' }
-
-export const PLEASE_PAY_MSG_EN = {
-    'en': "Kindly reply to the content of this whatsapp message\nwith your Immediate ticketing approval accordingly.",
-    'fr': "Merci SVP d’y répondre avec votre accord sur le contenu en\nvalidant à l’immédiat l’émission de vos billets d’avions conformémen."
-    , 'he': ''
-}
-
-export const PLEASE_PAY_AGAIN_MSG_EN = {
-    'en': "Thanks for replying to this whatsapp\nproposal with your immediate\nconfirmation.",
-    'fr': "Merci de repondre en validant a l'immediat\nl'emission du billet aux conditions mentionnées"
-    , 'he': ''
-}
-
-export const PRICE_MAY_CHANGE = {
-    'en': "Price may change\nunless tickets were issued!",
-    'fr': "Tarifs non garantis\ntant que billet non emist!"
-    , 'he': ''
-}
-
-export const FAREWELL = {
-    'en': "Thanks,\nGad",
-    'fr': "Merci,\nGad"
-    , 'he': ''
-}
-
-export const PRICES = {
-    'en': "Prices",
-    'fr': "Prix"
-    , 'he': 'מחיר'
-}
-
-
-export const RESTRICTIONS = {
-    'en': "Tickets Restrictions",
-    'fr': "Restrictions Tarifaires:"
-    , 'he': ''
-}
-
-
-export const CHANGE_RESTRICTION = {
-    'en': "Change fees",
-    'fr': "Changement:"
-    , 'he': ''
-}
-
-
-export const ADULT = {
-    'en': "Adult (+12)",
-    'fr': "Adulte (+12)"
-    , 'he': ''
-}
-
-export const CHILD = {
-    'en': "Child (+12)",
-    'fr': "Enfant (-12)"
-    , 'he': ''
-}
-
-export const YOUTH = {
-    'en': "Youth",
-    'fr': "jeune"
-    , 'he': ''
-}
-
-export const STUDENT = {
-    'en': "Student",
-    'fr': "Etudiant"
-    , 'he': ''
-}
-
-export const SENIOR = {
-    'en': "senior",
-    'fr': "senior"
-    , 'he': ''
-}
-
-export const INFANT = {
-    'en': "Infant (-2)",
-    'fr': "Bébé (-2)"
-    , 'he': ''
+export const FORM_ITEMS = {
+    prices: {
+        price: {
+            adult: { label: "adult", value: 0, type: "input" },
+            senior: { label: "senior", value: 0, type: "input" },
+            student: { label: "student", value: 0, type: "input" },
+            youth: { label: "youth", value: 0, type: "input" },
+            child: { label: "child", value: 0, type: "input" },
+            infant: { label: "infant", value: 0, type: "input" },
+        },
+        currancy: {
+            currancy: {
+                options: [
+                    { label: "$", value: "$" },
+                    { label: "€", value: "€" },
+                    { label: "₪", value: "₪" },
+                ],
+                selected: "$",
+                type: "radio",
+            },
+        },
+        restrictions: {
+            changeFee: { label: "Change fee", value: 0, type: "input" },
+            cancelFee: { label: "Cancel fee", value: 0, type: "input" },
+            noShowFee: { label: "No show fee", value: 0, type: "input" },
+        },
+    },
+    details: {
+        itinerary: {
+            itinerary: {
+                options: [
+                    { label: "One Way (O/W)", value: "One Way (O/W)" },
+                    { label: "Round Trip (R/T)", value: "Round Trip (R/T)" },
+                    { label: "Multi Destinations", value: "Multi Destinations" },
+                ],
+                selected: [],
+                type: "checkbox",
+            },
+        },
+        "carrier Type - hidden until text": {
+            "carrier Type - hidden until text": {
+                options: [
+                    { label: "Regular carrier", value: "Regular carrier" },
+                    { label: "Low cost Carrier", value: "Low cost Carrier" },
+                    { label: "Charter carrier", value: "Charter carrier" },
+                ],
+                selected: [],
+                type: "checkbox",
+            },
+        },
+        "airfare - hidden until text": {
+            "airfare - hidden until text": {
+                options: [
+                    { label: "Round Trip Fare", value: "airfare - Round Trip Fare" },
+                    { label: "One Way Fare ", value: "airfare - One Way Fare" },
+                    { label: "Your specific Itinerary requires the purchase of (1, 2, 3)", value: "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)" },
+                ],
+                selected: [],
+                type: "checkbox",
+            },
+        },
+        baggage: {
+            baggage: {
+                options: [
+                    { label: "No baggage", value: "no baggage" },
+                    { label: "Hand bag only", value: "hand bag only" },
+                    { label: "23 kg", value: "23 kg" },
+                ],
+                selected: [],
+                type: "checkbox",
+            },
+        },
+        food: {
+            food: {
+                options: [
+                    { label: "No meal", value: "No meal" },
+                    { label: "Regular meal", value: "Regular meal" },
+                    { label: "Kosher meal", value: "Kosher meal" },
+                ],
+                selected: "No meal",
+                type: "radio",
+            },
+        },
+    }
 }

@@ -68,7 +68,7 @@
               filled
               v-model="data.travelers[idx].type"
               emit-value
-              :options="travelerTypes"
+              :options="TRAVELER_TYPES"
               label="Filled"
             />
           </div>
@@ -152,7 +152,7 @@
         Language
       </h5>
 
-      <q-option-group :options="langs" type="radio" v-model="selectedLang" />
+      <q-option-group :options="LANGS" type="radio" v-model="selectedLang" />
     </div>
     <div class="full-width q-mt-xl q-px-sm" v-else>
       <q-input
@@ -175,23 +175,12 @@
 
 <script>
 import {
-  FLIGHT_DESC,
-  PLEASE_PAY_MSG_EN,
-  FLIGHT,
-  ALLER,
   DAYS,
-  RETOUR,
-  PRICE_MAY_CHANGE,
-  PLEASE_PAY_AGAIN_MSG_EN,
-  FAREWELL,
-  ADULT,
-  CHILD,
-  YOUTH,
-  STUDENT,
-  SENIOR,
-  INFANT,
-  PRICES,
-  RESTRICTIONS,
+  MONTHS,
+  TRAVELER_TYPES,
+  CLASSES_TYPE_MAP,
+  LANGS,
+  FORM_ITEMS,
 } from "src/assets/consts.js";
 
 import { airlines } from "src/assets/airlines_big.js";
@@ -200,40 +189,13 @@ export default {
   data() {
     return {
       tab: "info",
-      travelerTypes: [
-        { label: "adult", value: "adult", color: "primary" },
-        { label: "senior", value: "senior", color: "secondary" },
-        { label: "student", value: "student", color: "accent" },
-        { label: "youth", value: "youth", color: "yellow" },
-        { label: "child", value: "child", color: "green" },
-        { label: "infant", value: "infant", color: "pink" },
-      ],
-      classesTypeMap: {
-        "BUSINESS Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
-        "PREMIUM Cl.": ["W", "Q", "B", "P", "A"],
-        "ECONOMY Cl.": [
-          "Y",
-          "M",
-          "K",
-          "V",
-          "S",
-          "L",
-          "H",
-          "E",
-          "N",
-          "G",
-          "O",
-          "U",
-        ],
-      },
-      langs: [
-        { label: "English", value: "en" },
-        { label: "French", value: "fr" },
-      ],
+      TRAVELER_TYPES: TRAVELER_TYPES,
+      CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
+      LANGS: LANGS,
       selectedLang: "en",
       formStructure: {
         prices: ["price", "currancy", "restrictions"],
-        details: ["itinerary", "baggage", "food"],
+        details: ["itinerary","carrier Type - hidden until text","airfare - hidden until text", "baggage", "food"],
       },
       selectedBagges: [],
       data: {
@@ -242,77 +204,17 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode: "",
-        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        outboundAmadeusCode:
+           "",
+          // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         inboundAmadeusCode: "",
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
-        prices: {
-          price: {
-            adult: { label: "adult", value: 0, type: "input" },
-            senior: { label: "senior", value: 0, type: "input" },
-            student: { label: "student", value: 0, type: "input" },
-            youth: { label: "youth", value: 0, type: "input" },
-            child: { label: "child", value: 0, type: "input" },
-            infant: { label: "infant", value: 0, type: "input" },
-          },
-          currancy: {
-            currancy: {
-              options: [
-                { label: "$", value: "$" },
-                { label: "€", value: "€" },
-                { label: "₪", value: "₪" },
-              ],
-              selected: "$",
-              type: "radio",
-            },
-          },
-          restrictions: {
-            changeFee: { label: "Change fee", value: 0, type: "input" },
-            cancelFee: { label: "Cancel fee", value: 0, type: "input" },
-            noShowFee: { label: "No show fee", value: 0, type: "input" },
-          },
-        },
-        details: {
-          itinerary: {
-            itinerary: {
-              options: [
-                { label: "One Way (O/W)", value: "One Way (O/W)" },
-                { label: "Round Trip (R/T)", value: "Round Trip (R/T)" },
-                { label: "Multi Destinations", value: "Multi Destinations" },
-              ],
-              selected: [],
-              type: "checkbox",
-            },
-          },
-          baggage: {
-            baggage: {
-              options: [
-                { label: "No baggage", value: "no baggage" },
-                { label: "Hand bag only", value: "hand bag only" },
-                { label: "23 kg", value: "23 kg" },
-              ],
-              selected: [],
-              type: "checkbox",
-            },
-          },
-          food: {
-            food: {
-              options: [
-                { label: "No meal", value: "No meal" },
-                { label: "Regular meal", value: "Regular meal" },
-                { label: "Kosher meal", value: "Kosher meal" },
-              ],
-              selected: "No meal",
-              type: "radio",
-            },
-          },
-        },
+        journey: [],
+        classOfTravel: "",
+        ...FORM_ITEMS,
       },
       previewTxt: "",
       whatsappMessage: "",
-      departAirport: null,
-      destAirport: null,
-      journey: [],
     };
   },
   created() {
@@ -360,11 +262,14 @@ export default {
           way,
           airline,
           flightNumber,
+          latterOfclassOfTravel,
           departDate,
           departAirportCode,
           destAirportCode,
           departAirport,
           destAirport,
+          departDay,
+          destDay,
           departTime,
           destTime,
           destDate,
@@ -372,43 +277,79 @@ export default {
           txt = "";
         way =
           direction === "ALLER"
-            ? ALLER[this.selectedLang]
-            : RETOUR[this.selectedLang];
+            ? this.$t("outbound flight")
+            : this.$t("inbound flight");
         lines = linesString.split("\n");
         lines.forEach((line, idx) => {
           if (!line) return;
+          // * handles 4 numbers - ly1996
           line = line.splice(5, 0, " ");
+          // * handle * - 4*
           line = line.splice(20, 1, " ");
 
           splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
+          latterOfclassOfTravel = splited[3];
+
+          let isInClass = false;
+          for (const key in CLASSES_TYPE_MAP) {
+            isInClass = CLASSES_TYPE_MAP[key].some(
+              (latter) => latter === latterOfclassOfTravel
+            );
+            if (isInClass) this.data.classOfTravel = key;
+          }
+
           airline = airlines.filter((item) => {
             return item.IATA === splited[1];
           })[0].name;
           flightNumber = `${splited[1]}${splited[2]}`;
-          departDate = `${splited[4]}`;
           dayNumber = splited[5];
           departAirportCode = splited[6].slice(0, 3);
           destAirportCode = splited[6].slice(3, 6);
-          this.journey.push(index.lookupByIataCode(departAirportCode).city);
-          this.journey.push(index.lookupByIataCode(destAirportCode).city);
+          this.data.journey.push(
+            index.lookupByIataCode(departAirportCode).city
+          );
+          this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
           departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
           destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-
           departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
           destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
+          departDate = `${splited[4]}`;
           destDate = `${splited[10]}`;
-          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${departDate} ${
-            DAYS[this.selectedLang][dayNumber - 1]
-          } ${departTime}  \nArr. ${destDate} ${
-            DAYS[this.selectedLang][dayNumber]
-          } ${destTime} \n`;
+          departDay = DAYS[dayNumber - 1];
+
+          // * day logic
+          let departDateNumberOnly = +departDate.substr(0, 2),
+            destDateNumberOnly = +destDate.substr(0, 2),
+            departMonth = departDate.substr(2, 5),
+            destMonth = destDate.substr(2, 5);
+          if (departMonth === destMonth) {
+            destDay =
+              departDateNumberOnly !== destDateNumberOnly
+                ? departDateNumberOnly < destDateNumberOnly
+                  ? DAYS[dayNumber]
+                  : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+                  +dayNumber === 1
+                  ? DAYS[6]
+                  : DAYS[dayNumber - 2]
+                : departDay;
+          } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
+            // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+            destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
+          } else destDay = DAYS[dayNumber];
+          //
+
+          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${departDate} ${this.$t(
+            `${departDay}`
+          )} ${departTime}  \nArr. ${destDate} ${this.$t(
+            `${destDay}`
+          )} ${destTime} \n`;
         });
         return `${way} ${txt}`;
       } else return "";
     },
     onPreview() {
       let departTxt, destTxt, otherTravelers;
-      this.journey = [];
+      this.data.journey = [];
 
       departTxt = this.getAmadeusTranslate(
         "ALLER",
@@ -426,27 +367,33 @@ export default {
 
       this.whatsappMessage = `${this.capitalizeFirstLetter(
         this.data.travelers[0].name
-      )}, Shalom! 
-        \n\n${FLIGHT_DESC[this.selectedLang]} \n${this.journeyTxt}\n${
-        this.data.travelers.length >= 2 ? `Together with ${otherTravelers}` : ""
-      } \n\n${PLEASE_PAY_MSG_EN[this.selectedLang]} \n\n*Itinerary:* ${
+      )}, ${this.$t("shalom")} 
+        \n\n${this.$t("flight desc")} \n${this.journeyTxt}\n${
+        this.data.travelers.length >= 2
+          ? `${this.$t("together with")} ${otherTravelers}`
+          : ""
+      } \n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
         this.data.details.itinerary.itinerary.selected
       } \n${departTxt} \n${destTxt}
-\n\n*${PRICES[this.selectedLang]}:* \n${this.priceDetails} \n\n*${
-        RESTRICTIONS[this.selectedLang]
-      }:* \nChange: ${this.data.prices.restrictions.changeFee.value}${
-        this.selectedCurrancy
-      } \nCancel: ${this.data.prices.restrictions.cancelFee.value}${
-        this.selectedCurrancy
-      } \nNo show: ${this.data.prices.restrictions.noShowFee.value}${
-        this.selectedCurrancy
-      } \n\n*Details:* \n-Compartment: None \n-Baggage: ${
+*${this.$t("airline")}* \n\n
+*${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
+*${this.$t("prices")}:* \n${this.priceDetails} \n\n*${this.$t(
+        "restrictions"
+      )}:* \n${this.$t("change")} ${
+        this.data.prices.restrictions.changeFee.value
+      }${this.selectedCurrancy} \n${this.$t("cancel")} ${
+        this.data.prices.restrictions.cancelFee.value
+      }${this.selectedCurrancy} \n${this.$t("no show")} ${
+        this.data.prices.restrictions.noShowFee.value
+      }${this.selectedCurrancy} \n\n*${this.$t("details")}* \n${this.$t(
+        "compartment"
+      )} ${this.$t("none")} \n${this.$t("baggage")} ${
         this.totalBaggage
-      } \n-Meal: ${
+      } \n${this.$t("meal")} ${
         this.data.details.food.food.selected
-      } \n\n*Attention:* ❗ \n${PRICE_MAY_CHANGE[this.selectedLang]} \n\n${
-        PLEASE_PAY_AGAIN_MSG_EN[this.selectedLang]
-      } \n\n${FAREWELL[this.selectedLang]}      `;
+      } \n\n${this.$t("attention")} \n${this.$t(
+        "price may change"
+      )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -490,38 +437,27 @@ export default {
       let priceTxt = ``,
         passanger;
       for (const key in this.travelersTypeAmountMap) {
-        switch (key) {
-          case "adult":
-            passanger = ADULT[this.selectedLang];
-            break;
-          case "child":
-            passanger = CHILD[this.selectedLang];
-            break;
-          case "youth":
-            passanger = YOUTH[this.selectedLang];
-            break;
-          case "student":
-            passanger = STUDENT[this.selectedLang];
-            break;
-          case "senior":
-            passanger = SENIOR[this.selectedLang];
-            break;
-          case "infant":
-            passanger = INFANT[this.selectedLang];
-            break;
-        }
-        priceTxt += `${this.data.prices.price[key].value}${this.selectedCurrancy} x ${this.travelersTypeAmountMap[key]} ${passanger} \n`;
+        priceTxt += `${this.data.prices.price[key].value}${
+          this.selectedCurrancy
+        } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
       }
-      priceTxt += `\ntotal: ${this.totalPrice}${this.selectedCurrancy}`;
+      priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
+        this.selectedCurrancy
+      }`;
       return priceTxt;
     },
     journeyTxt() {
       let txt = "";
-      this.journey.forEach(
+      this.data.journey.forEach(
         (place, idx) =>
-          (txt += `${place} ${idx < this.journey.length - 1 ? "> " : ""}`)
+          (txt += `${place} ${idx < this.data.journey.length - 1 ? "> " : ""}`)
       );
       return txt;
+    },
+  },
+  watch: {
+    selectedLang(lang) {
+      this.$i18n.locale = lang;
     },
   },
 };
