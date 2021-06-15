@@ -24,11 +24,22 @@
 
     <div v-if="tab === 'info'" class="full-width">
       <section class="q-mt-xl">
-        <q-input
-          class="q-mb-xl q-px-sm"
-          v-model="data.whatsappNumber"
-          label="contact WhatsApp"
-        />
+        <div class="flex q-px-sm">
+          <q-input
+            :style="{ 'margin-right': contactListApiSupported ? '20px' : '' }"
+            style="flex: 1"
+            class="q-mb-xl"
+            v-model="data.whatsappNumber"
+            label="contact WhatsApp"
+          />
+          <q-btn
+            v-if="contactListApiSupported"
+            style="height: 50px"
+            color="primary"
+            icon="contacts"
+            @click="selectFromPhoneContactList()"
+          />
+        </div>
         <h5
           class="bg-secondary text-white text-center q-mt-xl q-py-sm q-mb-lg"
           style="opacity: 0.73"
@@ -125,13 +136,35 @@
             <h6>{{ item }}</h6>
             <div v-for="(option, idx) in data[boxName][item]" :key="idx">
               <q-input
-                v-if="option.type === 'input'"
+                v-if="option.type === 'input' && !option.hide"
                 class="q-mt-sm"
                 v-model.number="option.value"
                 type="number"
                 filled
                 :label="option.label"
                 style="max-width: 200px"
+              />
+
+              <q-select
+                v-else-if="option.type === 'selectMultiple'"
+                filled
+                :type="option.type"
+                v-model="option.selected"
+                multiple
+                :options="option.options"
+                label="Multiple selection"
+                style="max-width: 400px"
+                emit-value
+              />
+              <q-select
+                v-else-if="option.type === 'select'"
+                filled
+                :type="option.type"
+                v-model="option.selected"
+                :options="option.options"
+                label="Select"
+                style="max-width: 400px"
+                emit-value
               />
               <q-option-group
                 v-else-if="
@@ -156,6 +189,7 @@
     </div>
     <div class="full-width q-mt-xl q-px-sm" v-else>
       <q-input
+        :style="{ direction: selectedLang === 'he' ? 'rtl' : 'ltr' }"
         rows="20"
         placeholder="preview"
         v-model="whatsappMessage"
@@ -180,6 +214,7 @@ import {
   TRAVELER_TYPES,
   CLASSES_TYPE_MAP,
   LANGS,
+  FORM_STRUCTURE,
   FORM_ITEMS,
 } from "src/assets/consts.js";
 
@@ -189,14 +224,12 @@ export default {
   data() {
     return {
       tab: "info",
+      contactListApiSupported: false,
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
       LANGS: LANGS,
       selectedLang: "en",
-      formStructure: {
-        prices: ["price", "currancy", "restrictions"],
-        details: ["itinerary","carrier Type - hidden until text","airfare - hidden until text", "baggage", "food"],
-      },
+      formStructure: FORM_STRUCTURE,
       selectedBagges: [],
       data: {
         whatsappNumber: null,
@@ -204,9 +237,8 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode:
-           "",
-          // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        outboundAmadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         inboundAmadeusCode: "",
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
@@ -222,6 +254,14 @@ export default {
   },
   methods: {
     init() {
+      if (
+        "contacts" in navigator &&
+        "select" in navigator.contacts &&
+        "getProperties" in navigator.contacts
+      ) {
+        this.contactListApiSupported = true;
+      }
+
       if (!String.prototype.splice) {
         /**
          * {JSDoc}
@@ -242,6 +282,41 @@ export default {
             this.slice(start + Math.abs(delCount))
           );
         };
+      }
+    },
+    async selectFromPhoneContactList() {
+      if (this.contactListApiSupported) {
+        try {
+          const availableProperties = await navigator.contacts.getProperties();
+
+          if (availableProperties.includes("address")) {
+            const contactProperties = ["name", "tel", "address"];
+
+            const contacts = await navigator.contacts.select(
+              contactProperties,
+              { multiple: true }
+            );
+
+            console.log(
+              "Your first contact: " +
+                contacts[0].name +
+                " " +
+                contacts[0].tel +
+                " " +
+                contacts[0].address
+            );
+            this.data.whatsappNumber = contacts[0].tel;
+            this.data.travelers[0].name = contacts[0].name;
+          } else {
+            console.log(
+              "Contact Picker API on your device doesn't support address property"
+            );
+          }
+        } catch {
+          console.log("Unexpected error happened in Contact Picker API");
+        }
+      } else {
+        console.log("Your browser doesn't support Contact Picker API");
       }
     },
     onAddTraveler() {
@@ -458,6 +533,17 @@ export default {
   watch: {
     selectedLang(lang) {
       this.$i18n.locale = lang;
+    },
+    "data.travelers": {
+      handler(travelers) {
+        for (const key in this.data.prices.price) {
+          if (travelers.filter((traveler) => traveler.type === key).length) {
+            this.data.prices.price[key].hide = false;
+          } else this.data.prices.price[key].hide = true;
+        }
+      },
+      deep: true,
+      immediate: true,
     },
   },
 };

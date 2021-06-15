@@ -19,17 +19,32 @@ export const CLASSES_TYPE_MAP = {
 export const LANGS = [
     { label: "English", value: "en" },
     { label: "French", value: "fr" },
+    { label: "Hebrew", value: "he" },
 ]
+
+export const FORM_STRUCTURE = {
+    prices: ["price", "currancy", "restrictions"],
+    details: [
+        "itinerary",
+        "carrier Type - hidden until text",
+        "airfare - hidden until text",
+        "baggage",
+        "food",
+        "Not included in price - hidden until text",
+        "optional Supplement - hidden until text",
+        "ticket Issuance Time Limit - hidden until text",
+    ],
+}
 
 export const FORM_ITEMS = {
     prices: {
         price: {
-            adult: { label: "adult", value: 0, type: "input" },
-            senior: { label: "senior", value: 0, type: "input" },
-            student: { label: "student", value: 0, type: "input" },
-            youth: { label: "youth", value: 0, type: "input" },
-            child: { label: "child", value: 0, type: "input" },
-            infant: { label: "infant", value: 0, type: "input" },
+            adult: { label: "adult", value: 0, type: "input", hide: true },
+            senior: { label: "senior", value: 0, type: "input", hide: true },
+            student: { label: "student", value: 0, type: "input", hide: true },
+            youth: { label: "youth", value: 0, type: "input", hide: true },
+            child: { label: "child", value: 0, type: "input", hide: true },
+            infant: { label: "infant", value: 0, type: "input", hide: true },
         },
         currancy: {
             currancy: {
@@ -39,7 +54,7 @@ export const FORM_ITEMS = {
                     { label: "₪", value: "₪" },
                 ],
                 selected: "$",
-                type: "radio",
+                type: "select",
             },
         },
         restrictions: {
@@ -56,8 +71,8 @@ export const FORM_ITEMS = {
                     { label: "Round Trip (R/T)", value: "Round Trip (R/T)" },
                     { label: "Multi Destinations", value: "Multi Destinations" },
                 ],
-                selected: [],
-                type: "checkbox",
+                selected: "",
+                type: "select",
             },
         },
         "carrier Type - hidden until text": {
@@ -68,7 +83,7 @@ export const FORM_ITEMS = {
                     { label: "Charter carrier", value: "Charter carrier" },
                 ],
                 selected: [],
-                type: "checkbox",
+                type: "selectMultiple",
             },
         },
         "airfare - hidden until text": {
@@ -78,19 +93,22 @@ export const FORM_ITEMS = {
                     { label: "One Way Fare ", value: "airfare - One Way Fare" },
                     { label: "Your specific Itinerary requires the purchase of (1, 2, 3)", value: "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)" },
                 ],
-                selected: [],
-                type: "checkbox",
+                selected: "",
+                type: "select",
             },
         },
         baggage: {
             baggage: {
                 options: [
-                    { label: "No baggage", value: "no baggage" },
-                    { label: "Hand bag only", value: "hand bag only" },
-                    { label: "23 kg", value: "23 kg" },
+                    { label: "No Checked bag", value: "No Checked bag" },
+                    { label: "Carry-on Baggage", value: "Carry-on Baggage" },
+                    { label: "1 Checked bag 23 kg", value: "1 Checked bag 23 kg" },
+                    { label: "2 Checked bag 23 kg", value: "2 Checked bag 23 kg" },
+                    { label: "1 Checked bag 20 kg", value: "1 Checked bag 20 kg" },
+                    { label: "2 Checked bag 20 kg", value: "2 Checked bag 20 kg" },
                 ],
                 selected: [],
-                type: "checkbox",
+                type: "selectMultiple",
             },
         },
         food: {
@@ -100,8 +118,45 @@ export const FORM_ITEMS = {
                     { label: "Regular meal", value: "Regular meal" },
                     { label: "Kosher meal", value: "Kosher meal" },
                 ],
-                selected: "No meal",
-                type: "radio",
+                selected: [],
+                type: "selectMultiple",
+            },
+        },
+        "Not included in price - hidden until text": {
+            "Not included in price - hidden until text": {
+                options: [
+                    { label: "No Checked bag", value: "No Checked bag" },
+                    { label: "No early seat selection", value: "No early seat selection" },
+                    { label: "No meals", value: "No meals" },
+                ],
+                selected: [],
+                type: "selectMultiple",
+            },
+        },
+        "optional Supplement - hidden until text": {
+            "optional Supplement - hidden until text": {
+                options: [
+                    { label: "standard seat", value: "Standard Seat" },
+                    { label: "Preferred Seat", value: "Preferred Seat" },
+                    { label: "Checked Bag", value: "Checked Bag" },
+                    { label: "Extra Checked Bag", value: "Extra Checked Bag" },
+                    { label: "Meals", value: "Meals" },
+                ],
+                selected: [],
+                type: "selectMultiple",
+            },
+        },
+        "ticket Issuance Time Limit - hidden until text": {
+            "ticket Issuance Time Limit - hidden until text": {
+                options: [
+                    { label: "Immediate Purchase", value: "airfare - Immediate Purchase" },
+                    { label: "Today before (time) ", value: "airfare - Today before (time)" },
+                    { label: "Within 24h", value: "airfare - Within 24h" },
+                    { label: "Within 48h", value: "airfare - Within 48h" },
+                    { label: "Within 72h", value: "airfare - Within 72h" },
+                ],
+                selected: "",
+                type: "select",
             },
         },
     }

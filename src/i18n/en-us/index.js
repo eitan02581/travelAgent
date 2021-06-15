@@ -48,6 +48,6 @@ export default {
     "class of travel": "class of travel",
     "airfare - Round Trip Fare": "Round Trip Fare",
     "airfare - One Way Fare": "One Way Fare",
-    "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)": "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)",
-    "": "",
+    "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)": "Your specific Itinerary requires the purchase of (1, 2, 3) several separated tickets, each of them with its own fare & restrictions! \n* For your convenience you may choose between one of the following 3 family fare levels for this same trip \n- please kindly mention your choice accordingly: \n-Eco Lite (restrictive rate) \n-Eco Classic (semi-restrictive rate) \n-Eco Flex (more flexible rate) \n- Bonus Ticket \n- Cash & Points Ticket",
+    "Carry-on Baggage": "Shouldn’t exceed \n56 x 36 x 23 cm \n(including handles & wheels)",
 }
