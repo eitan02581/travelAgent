@@ -251,6 +251,7 @@ export default {
   },
   created() {
     this.init();
+    this.data.travelers[0].name = "אבא";
   },
   methods: {
     init() {
@@ -294,7 +295,7 @@ export default {
 
             const contacts = await navigator.contacts.select(
               contactProperties,
-              { multiple: true }
+              { multiple: false }
             );
 
             console.log(
@@ -306,7 +307,7 @@ export default {
                 contacts[0].address
             );
             this.data.whatsappNumber = contacts[0].tel;
-            this.data.travelers[0].name = contacts[0].name;
+            this.data.travelers[0].name = `${contacts[0].name}`;
           } else {
             console.log(
               "Contact Picker API on your device doesn't support address property"
@@ -435,6 +436,7 @@ export default {
         this.data.inboundAmadeusCode
       );
 
+      console.log(this.data.travelers);
       otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
         .map((traveler) => this.capitalizeFirstLetter(traveler.name))
@@ -471,6 +473,7 @@ export default {
       )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
     },
     capitalizeFirstLetter(string) {
+      console.log("capitalizeFirstLetter", string);
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     onRedirectToWhatsapp() {
