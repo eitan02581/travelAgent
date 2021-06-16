@@ -474,7 +474,7 @@ export default {
     onRedirectToWhatsapp() {
       const url = `https://api.whatsapp.com/send?phone=${
         this.data.whatsappNumber
-      }&text=%20${encodeURI(this.whatsappMessage)}`;
+      }&text=%20${encodeURIComponent(this.whatsappMessage)}`;
       window.open(url, "_blank");
     },
     getAmountOfSpecificTraveler(travelerType) {
