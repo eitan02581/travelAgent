@@ -23,11 +23,11 @@ export const LANGS = [
 ]
 
 export const FORM_STRUCTURE = {
-    prices: ["price", "currancy", "restrictions"],
+    prices: ["price", "currancy", "restrictions", "Change Fees"],
     details: [
         "itinerary",
         "carrier Type - hidden until text",
-        "airfare - hidden until text",
+        "airfare",
         "baggage",
         "food",
         "Not included in price - hidden until text",
@@ -62,6 +62,17 @@ export const FORM_ITEMS = {
             cancelFee: { label: "Cancel fee", value: 0, type: "input" },
             noShowFee: { label: "No show fee", value: 0, type: "input" },
         },
+        "Change Fees": {
+            "Change Fees": {
+                options: [
+                    { label: "Non Changeable", value: "Non Changeable" },
+                    { label: "price - (+difference in fare)", value: "(+difference in fare)" },
+                    { label: "price - Only permitted upon availability on Bonus Quota!", value: "price - Only permitted upon availability on Bonus Quota!" },
+                ],
+                selected: "",
+                type: "select",
+            },
+        },
     },
     details: {
         itinerary: {
@@ -78,20 +89,20 @@ export const FORM_ITEMS = {
         "carrier Type - hidden until text": {
             "carrier Type - hidden until text": {
                 options: [
-                    { label: "Regular carrier", value: "Regular carrier" },
-                    { label: "Low cost Carrier", value: "Low cost Carrier" },
-                    { label: "Charter carrier", value: "Charter carrier" },
+                    { label: "Regular carrier / flight", value: "Regular carrier / flight" },
+                    { label: "Low cost carrier / flight", value: "Low cost carrier / flight" },
+                    { label: "Charter carrier / flight", value: "Charter carrier / flight" },
                 ],
                 selected: [],
                 type: "selectMultiple",
             },
         },
-        "airfare - hidden until text": {
-            "airfare - hidden until text": {
+        "airfare": {
+            "airfare": {
                 options: [
-                    { label: "Round Trip Fare", value: "airfare - Round Trip Fare" },
-                    { label: "One Way Fare ", value: "airfare - One Way Fare" },
-                    { label: "Your specific Itinerary requires the purchase of (1, 2, 3)", value: "airfare - Your specific Itinerary requires the purchase of (1, 2, 3)" },
+                    { label: "One Way Fare ", value: "one Way Fare" },
+                    { label: "Round Trip Fare", value: "round Trip Fare" },
+                    { label: "Family fare", value: "family fare" },
                 ],
                 selected: "",
                 type: "select",
@@ -100,12 +111,12 @@ export const FORM_ITEMS = {
         baggage: {
             baggage: {
                 options: [
-                    { label: "No Checked bag", value: "No Checked bag" },
-                    { label: "Carry-on Baggage", value: "Carry-on Baggage" },
-                    { label: "1 Checked bag 23 kg", value: "1 Checked bag 23 kg" },
-                    { label: "2 Checked bag 23 kg", value: "2 Checked bag 23 kg" },
-                    { label: "1 Checked bag 20 kg", value: "1 Checked bag 20 kg" },
-                    { label: "2 Checked bag 20 kg", value: "2 Checked bag 20 kg" },
+                    { label: "No Checked bag", value: "\nNo Checked bag" },
+                    { label: "Carry-on Baggage", value: "\nCarry-on Baggage" },
+                    { label: "1 Checked bag 23 kg", value: "\n1 Checked bag 23 kg" },
+                    { label: "2 Checked bag 23 kg", value: "\n2 Checked bag 23 kg" },
+                    { label: "1 Checked bag 20 kg", value: "\n1 Checked bag 20 kg" },
+                    { label: "2 Checked bag 20 kg", value: "\n2 Checked bag 20 kg" },
                 ],
                 selected: [],
                 type: "selectMultiple",
@@ -116,7 +127,21 @@ export const FORM_ITEMS = {
                 options: [
                     { label: "No meal", value: "No meal" },
                     { label: "Regular meal", value: "Regular meal" },
-                    { label: "Kosher meal", value: "Kosher meal" },
+                    { label: "Kosher meal (KSML)", value: "Kosher meal (KSML)" },
+                    { label: "Fish meal (FSML)", value: "Fish meal (FSML)" },
+                    { label: "Fruit meal (FPML)", value: "Fruit meal (FPML)" },
+                    { label: "Pure vegetarian (vegan) meal (VGML)", value: "Pure vegetarian (vegan) meal (VGML)" },
+                    { label: "Vegetarian meal (VLML)", value: "Vegetarian meal that includes dairy products and egg products (VLML)" },
+                    { label: "Low sugar meal (DBML)", value: "Low sugar meal (DBML)" },
+                    { label: "Reduced gluten meal* (GFML)", value: "Reduced gluten meal* (GFML)" },
+                    { label: "Low salt meal (LSML)", value: "Low salt meal (LSML)" },
+                    { label: "Low lactose* meal (NLML)", value: "Low lactose* meal (NLML)" },
+                    { label: "Mehadrin kosher meal (SKML)", value: "Mehadrin kosher meal (SKML)" },
+                    { label: "Mehadrin kosher fish (KFML)", value: "Mehadrin kosher fish (KFML)" },
+                    { label: "Mehadrin kosher children’s meal (KCML)", value: "Mehadrin kosher children’s meal (KCML)" },
+                    { label: "Mehadrin Regal kosher fish meal (RFML)", value: "Mehadrin Regal kosher fish meal (RFML)" },
+                    { label: "Mehadrin Regal kosher children’s meal (KCML)", value: "Mehadrin Regal kosher children’s meal (KCML" },
+                    { label: "Mehadrin Regal kosher vegetarian meal (GVML)", value: "Mehadrin Regal kosher vegetarian meal (GVML)" },
                 ],
                 selected: [],
                 type: "selectMultiple",

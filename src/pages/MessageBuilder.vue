@@ -251,7 +251,6 @@ export default {
   },
   created() {
     this.init();
-    this.data.travelers[0].name = "אבא";
   },
   methods: {
     init() {
@@ -298,14 +297,6 @@ export default {
               { multiple: false }
             );
 
-            console.log(
-              "Your first contact: " +
-                contacts[0].name +
-                " " +
-                contacts[0].tel +
-                " " +
-                contacts[0].address
-            );
             this.data.whatsappNumber = contacts[0].tel;
             this.data.travelers[0].name = `${contacts[0].name}`;
           } else {
@@ -414,11 +405,11 @@ export default {
           } else destDay = DAYS[dayNumber];
           //
 
-          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${departDate} ${this.$t(
+          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${this.$t(
             `${departDay}`
-          )} ${departTime}  \nArr. ${destDate} ${this.$t(
+          )} ${departDate} ${departTime}  \nArr. ${this.$t(
             `${destDay}`
-          )} ${destTime} \n`;
+          )} ${destDate} ${destTime} \n`;
         });
         return `${way} ${txt}`;
       } else return "";
@@ -436,7 +427,6 @@ export default {
         this.data.inboundAmadeusCode
       );
 
-      console.log(this.data.travelers);
       otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
         .map((traveler) => this.capitalizeFirstLetter(traveler.name))
@@ -454,26 +444,31 @@ export default {
       } \n${departTxt} \n${destTxt}
 *${this.$t("airline")}* \n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
-*${this.$t("prices")}:* \n${this.priceDetails} \n\n*${this.$t(
-        "restrictions"
-      )}:* \n${this.$t("change")} ${
-        this.data.prices.restrictions.changeFee.value
-      }${this.selectedCurrancy} \n${this.$t("cancel")} ${
-        this.data.prices.restrictions.cancelFee.value
-      }${this.selectedCurrancy} \n${this.$t("no show")} ${
+*${this.$t("prices")}:* \n${this.priceDetails} \n\n
+*${this.$t("airfare")}:* \n${this.airfareTxt} \n\n
+*${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
+        "change"
+      )} ${this.data.prices.restrictions.changeFee.value}${
+        this.selectedCurrancy
+      } ${this.$t("p. p")}\n${this.$t("(+difference in fare)")} \n${this.$t(
+        "cancel"
+      )} ${this.data.prices.restrictions.cancelFee.value}${
+        this.selectedCurrancy
+      } ${this.$t("p. p")} \n${this.$t("no show")} ${
         this.data.prices.restrictions.noShowFee.value
-      }${this.selectedCurrancy} \n\n*${this.$t("details")}* \n${this.$t(
-        "compartment"
-      )} ${this.$t("none")} \n${this.$t("baggage")} ${
-        this.totalBaggage
-      } \n${this.$t("meal")} ${
-        this.data.details.food.food.selected
-      } \n\n${this.$t("attention")} \n${this.$t(
+      }${this.selectedCurrancy} ${this.$t("p. p")} \n\n*${this.$t(
+        "details"
+      )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n${this.$t(
+        "baggage"
+      )} 🧳 ${this.totalBaggage} \n\n${this.$t(
+        "meal"
+      )} 🍴 ${this.data.details.food.food.selected.map(
+        (meal) => `\n${this.$t(meal)}`
+      )} \n\n${this.$t("attention")} \n${this.$t(
         "price may change"
       )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
     },
     capitalizeFirstLetter(string) {
-      console.log("capitalizeFirstLetter", string);
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     onRedirectToWhatsapp() {
@@ -531,6 +526,15 @@ export default {
           (txt += `${place} ${idx < this.data.journey.length - 1 ? "> " : ""}`)
       );
       return txt;
+    },
+    airfareTxt() {
+      const fare = this.data.details.airfare.airfare.selected;
+      if (fare === "family fare") {
+        return `${this.$t("family fare")} \n\n${this.$t(
+          "eco lite"
+        )} \n\n${this.$t("eco classic")} \n\n${this.$t("eco flex")}`;
+      }
+      return this.$t(fare);
     },
   },
   watch: {
