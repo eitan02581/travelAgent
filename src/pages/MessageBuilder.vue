@@ -237,10 +237,12 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode: "",
-        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
-        inboundAmadeusCode: "",
-        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        outboundAmadeusCode:
+          //  "",
+          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        inboundAmadeusCode:
+          //  "",
+          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
         classOfTravel: "",
         ...FORM_ITEMS,
@@ -330,6 +332,7 @@ export default {
           airline,
           flightNumber,
           latterOfclassOfTravel,
+          flightClass,
           departDate,
           departAirportCode,
           destAirportCode,
@@ -362,7 +365,12 @@ export default {
             isInClass = CLASSES_TYPE_MAP[key].some(
               (latter) => latter === latterOfclassOfTravel
             );
-            if (isInClass) this.data.classOfTravel = key;
+            if (isInClass) {
+              flightClass = key;
+              if (this.data.classOfTravel && this.data.classOfTravel !== key) {
+                this.data.classOfTravel = "combined compartment";
+              } else this.data.classOfTravel = key;
+            }
           }
 
           airline = airlines.filter((item) => {
@@ -405,9 +413,15 @@ export default {
           } else destDay = DAYS[dayNumber];
           //
 
-          txt += `\n${airline}-(${flightNumber}) \n${departAirport} (${departAirportCode}) - ${destAirport} (${destAirportCode}) \nDpt. ${this.$t(
+          txt += `\n${airline} - *${flightNumber}* \n ${
+            departAirport === "Tel-aviv" ? "Tel-Aviv" : `(${departAirport})`
+          } ${
+            departAirport === "Tel-aviv" ? "" : `(${departAirportCode})`
+          } - ${destAirport} (${destAirportCode}) \n${this.$t(
+            `${flightClass}`
+          )} \n ${this.$t("dpt.")} ${this.$t(
             `${departDay}`
-          )} ${departDate} ${departTime}  \nArr. ${this.$t(
+          )} ${departDate} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
             `${destDay}`
           )} ${destDate} ${destTime} \n`;
         });
@@ -417,6 +431,7 @@ export default {
     onPreview() {
       let departTxt, destTxt, otherTravelers;
       this.data.journey = [];
+      this.data.classOfTravel = "";
 
       departTxt = this.getAmadeusTranslate(
         "ALLER",
@@ -449,14 +464,14 @@ export default {
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
         "change"
       )} ${this.data.prices.restrictions.changeFee.value}${
-        this.selectedCurrancy
+        this.selectedCurrency
       } ${this.$t("p. p")}\n${this.$t("(+difference in fare)")} \n${this.$t(
         "cancel"
       )} ${this.data.prices.restrictions.cancelFee.value}${
-        this.selectedCurrancy
+        this.selectedCurrency
       } ${this.$t("p. p")} \n${this.$t("no show")} ${
         this.data.prices.restrictions.noShowFee.value
-      }${this.selectedCurrancy} ${this.$t("p. p")} \n\n*${this.$t(
+      }${this.selectedCurrency} ${this.$t("p. p")} \n\n*${this.$t(
         "details"
       )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n${this.$t(
         "baggage"
@@ -483,8 +498,8 @@ export default {
     },
   },
   computed: {
-    selectedCurrancy() {
-      return this.data.prices.currancy.currancy.selected;
+    selectedCurrency() {
+      return this.data.prices.currency.currency.selected;
     },
     travelersTypeAmountMap() {
       let travelersTypeAmountMap = {};
@@ -511,11 +526,11 @@ export default {
         passanger;
       for (const key in this.travelersTypeAmountMap) {
         priceTxt += `${this.data.prices.price[key].value}${
-          this.selectedCurrancy
+          this.selectedCurrency
         } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
       }
       priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
-        this.selectedCurrancy
+        this.selectedCurrency
       }`;
       return priceTxt;
     },

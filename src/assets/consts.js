@@ -23,7 +23,7 @@ export const LANGS = [
 ]
 
 export const FORM_STRUCTURE = {
-    prices: ["price", "currancy", "restrictions", "Change Fees"],
+    prices: ["price", "currency", "restrictions", "Change Fees - hidden until text", "no show - hidden until text"],
     details: [
         "itinerary",
         "carrier Type - hidden until text",
@@ -46,8 +46,8 @@ export const FORM_ITEMS = {
             child: { label: "child", value: 0, type: "input", hide: true },
             infant: { label: "infant", value: 0, type: "input", hide: true },
         },
-        currancy: {
-            currancy: {
+        currency: {
+            currency: {
                 options: [
                     { label: "$", value: "$" },
                     { label: "€", value: "€" },
@@ -62,12 +62,26 @@ export const FORM_ITEMS = {
             cancelFee: { label: "Cancel fee", value: 0, type: "input" },
             noShowFee: { label: "No show fee", value: 0, type: "input" },
         },
-        "Change Fees": {
-            "Change Fees": {
+        "Change Fees - hidden until text": {
+            "Change Fees - hidden until text": {
                 options: [
+                    // ! add input of fee
                     { label: "Non Changeable", value: "Non Changeable" },
-                    { label: "price - (+difference in fare)", value: "(+difference in fare)" },
-                    { label: "price - Only permitted upon availability on Bonus Quota!", value: "price - Only permitted upon availability on Bonus Quota!" },
+                    { label: "change fee - (+difference in fare)", value: "(+difference in fare)" },
+                    { label: "change fee - Only permitted upon availability on Bonus Quota!", value: "price - Only permitted upon availability on Bonus Quota!" },
+                ],
+                selected: "",
+                type: "select",
+            },
+        },
+        "no show - hidden until text": {
+            "no show - hidden until text": {
+                options: [
+                    { label: "total loss", value: "total loss" },
+                    // ! add input of fee
+                    { label: "no show fee", value: "no show fee" },
+                    // ! add 2 input of fee
+                    { label: "no show fee + change fee", value: "no show fee + change fee" },
                 ],
                 selected: "",
                 type: "select",

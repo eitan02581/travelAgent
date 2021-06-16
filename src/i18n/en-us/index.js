@@ -47,6 +47,7 @@ export default {
     "total": "total:",
     "airline": "Airline:",
     "class of travel": "Compartment",
+    "combined compartment":"combined compartment",
     "round Trip Fare": "Round Trip Fare",
     "one Way Fare": "One Way Fare",
     "family fare": "Your specific Itinerary requires the purchase of (1, 2, 3) several separated tickets, each of them with its own fare & restrictions! \n* For your convenience you may choose between one of the following 3 family fare levels for this same trip \nplease kindly mention your choice accordingly: \n-Eco Lite (restrictive rate) \n-Eco Classic (semi-restrictive rate) \n-Eco Flex (more flexible rate) ",
