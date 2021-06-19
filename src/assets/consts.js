@@ -14,7 +14,7 @@ export const TRAVELER_TYPES = [
 export const CLASSES_TYPE_MAP = {
     "BUSINESS Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
     "PREMIUM Cl.": ["W", "Q", "B", "P", "A"],
-    "ECONOMY Cl.": ["Y", "M", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
+    "ECONOMY Cl.": ["Y", "M","T", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
 }
 export const LANGS = [
     { label: "English", value: "en" },
@@ -23,7 +23,7 @@ export const LANGS = [
 ]
 
 export const FORM_STRUCTURE = {
-    prices: ["price", "currency", "restrictions", "Change Fees - hidden until text", "no show - hidden until text"],
+    prices: ["price", "currency", "cancel fee", "Change Fees - hidden until text", "no show - hidden until text"],
     details: [
         "itinerary",
         "carrier Type - hidden until text",
@@ -35,7 +35,12 @@ export const FORM_STRUCTURE = {
         "ticket Issuance Time Limit - hidden until text",
     ],
 }
-
+// * list of words to prevent misspelling and mismatches
+export const FAMILY_FARE = "Family fare"
+export const NO_SHOW_FEE = "No show fee"
+export const NO_SHOW_PLUS_CHANGE_FEE = "No show + change fee"
+export const CHANGE_FEE = "change fee"
+// 
 export const FORM_ITEMS = {
     prices: {
         price: {
@@ -57,10 +62,10 @@ export const FORM_ITEMS = {
                 type: "select",
             },
         },
-        restrictions: {
-            changeFee: { label: "Change fee", value: 0, type: "input" },
+        "cancel fee": {
+            // changeFee: { label: "Change fee", value: 0, type: "input" },
             cancelFee: { label: "Cancel fee", value: 0, type: "input" },
-            noShowFee: { label: "No show fee", value: 0, type: "input" },
+            // noShowFee: { label: "No show fee", value: 0, type: "input" },
         },
         "Change Fees - hidden until text": {
             "Change Fees - hidden until text": {
@@ -73,18 +78,34 @@ export const FORM_ITEMS = {
                 selected: "",
                 type: "select",
             },
+            [CHANGE_FEE]: {
+                subInput: true,
+                label: CHANGE_FEE,
+                value: 0,
+                type: "input"
+            },
         },
         "no show - hidden until text": {
             "no show - hidden until text": {
                 options: [
                     { label: "total loss", value: "total loss" },
-                    // ! add input of fee
-                    { label: "no show fee", value: "no show fee" },
-                    // ! add 2 input of fee
-                    { label: "no show fee + change fee", value: "no show fee + change fee" },
+                    { label: NO_SHOW_FEE, value: NO_SHOW_FEE },
+                    { label: NO_SHOW_PLUS_CHANGE_FEE, value: NO_SHOW_PLUS_CHANGE_FEE },
                 ],
                 selected: "",
                 type: "select",
+            },
+            [NO_SHOW_FEE]: {
+                subInput: true,
+                label: NO_SHOW_FEE,
+                value: 0,
+                type: "input"
+            },
+            [NO_SHOW_PLUS_CHANGE_FEE]: {
+                subInput: true,
+                label: NO_SHOW_PLUS_CHANGE_FEE,
+                value: 0,
+                type: "input"
             },
         },
     },
@@ -116,10 +137,21 @@ export const FORM_ITEMS = {
                 options: [
                     { label: "One Way Fare ", value: "one Way Fare" },
                     { label: "Round Trip Fare", value: "round Trip Fare" },
-                    { label: "Family fare", value: "family fare" },
+                    { label: "Family fare", value: FAMILY_FARE },
                 ],
                 selected: "",
                 type: "select",
+            },
+            [FAMILY_FARE]: {
+                subInput: true,
+                nameLabel: true,
+                options: [
+                    { label: "eco lite", value: "eco lite" },
+                    { label: "eco classic", value: "eco classic" },
+                    { label: "eco flex", value: "eco flex" },
+                ],
+                selected: [],
+                type: "selectMultiple",
             },
         },
         baggage: {

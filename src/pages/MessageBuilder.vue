@@ -134,36 +134,54 @@
             :class="[index === 0 ? 'q-mt-md' : 'q-mt-xl']"
           >
             <h6>{{ item }}</h6>
-            <div v-for="(option, idx) in data[boxName][item]" :key="idx">
+            <div
+              v-for="(option, optionName) in data[boxName][item]"
+              :key="optionName"
+            >
               <q-input
-                v-if="option.type === 'input' && !option.hide"
+                v-if="
+                  option.type === 'input' &&
+                  !option.hide &&
+                  checkIfDisplay(optionName)
+                "
                 class="q-mt-sm"
                 v-model.number="option.value"
                 type="number"
                 filled
                 :label="option.label"
                 style="max-width: 200px"
+                :class="[option.subInput ? 'q-ml-md q-mt-sm' : '']"
               />
 
               <q-select
-                v-else-if="option.type === 'selectMultiple'"
+                v-else-if="
+                  option.type === 'selectMultiple' && checkIfDisplay(optionName)
+                "
                 filled
                 :type="option.type"
                 v-model="option.selected"
                 multiple
                 :options="option.options"
-                label="Multiple selection"
+                :label="
+                  option.nameLabel
+                    ? `${optionName} Multiple selection`
+                    : 'Multiple selection'
+                "
                 style="max-width: 400px"
+                :class="[option.subInput ? 'q-ml-md q-mt-sm' : '']"
                 emit-value
               />
               <q-select
-                v-else-if="option.type === 'select'"
+                v-else-if="
+                  option.type === 'select' && checkIfDisplay(optionName)
+                "
                 filled
                 :type="option.type"
                 v-model="option.selected"
                 :options="option.options"
                 label="Select"
                 style="max-width: 400px"
+                :class="[option.subInput ? 'q-ml-md q-mt-sm' : '']"
                 emit-value
               />
               <q-option-group
@@ -216,6 +234,10 @@ import {
   LANGS,
   FORM_STRUCTURE,
   FORM_ITEMS,
+  FAMILY_FARE,
+  NO_SHOW_FEE,
+  NO_SHOW_PLUS_CHANGE_FEE,
+  CHANGE_FEE,
 } from "src/assets/consts.js";
 
 import { airlines } from "src/assets/airlines_big.js";
@@ -237,12 +259,14 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode:
-          //  "",
-          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
-        inboundAmadeusCode:
-          //  "",
-          "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        outboundAmadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
+        //         `2  AF1621 T 08JUL 4*TLVCDG HK1  1625 1955  08JUL  E  AF/UDWPNI
+        // 3  AF7728 T 08JUL 4*CDGNTE HK1  2110 2220  08JUL  E  AF/UDWPNI
+        // 4  AF7721 E 11JUL 7*NTECDG HK1  0600 0710  11JUL  E  AF/UDWPNI
+        // 5  AF1620 E 11JUL 7*CDGTLV HK1  0920 1435  11JUL  E  AF/UDWPNI`,
+        inboundAmadeusCode: "",
+        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
         classOfTravel: "",
         ...FORM_ITEMS,
@@ -349,17 +373,19 @@ export default {
           direction === "ALLER"
             ? this.$t("outbound flight")
             : this.$t("inbound flight");
-        lines = linesString.split("\n");
+        lines = linesString
+          .split("AF")
+          .filter((item, idx) => idx % 2 === 1)
+          .map((item) => `AF${item}`);
         lines.forEach((line, idx) => {
           if (!line) return;
           // * handles 4 numbers - ly1996
-          line = line.splice(5, 0, " ");
+          line = line.splice(2, 0, " ");
           // * handle * - 4*
-          line = line.splice(20, 1, " ");
+          line = line.splice(17, 1, " ");
 
           splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-          latterOfclassOfTravel = splited[3];
-
+          latterOfclassOfTravel = splited[2];
           let isInClass = false;
           for (const key in CLASSES_TYPE_MAP) {
             isInClass = CLASSES_TYPE_MAP[key].some(
@@ -374,22 +400,22 @@ export default {
           }
 
           airline = airlines.filter((item) => {
-            return item.IATA === splited[1];
+            return item.IATA === splited[0];
           })[0].name;
-          flightNumber = `${splited[1]}${splited[2]}`;
-          dayNumber = splited[5];
-          departAirportCode = splited[6].slice(0, 3);
-          destAirportCode = splited[6].slice(3, 6);
+          flightNumber = `${splited[0]}${splited[1]}`;
+          dayNumber = splited[4];
+          departAirportCode = splited[5].slice(0, 3);
+          destAirportCode = splited[5].slice(3, 6);
           this.data.journey.push(
             index.lookupByIataCode(departAirportCode).city
           );
           this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
           departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
           destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
-          departDate = `${splited[4]}`;
-          destDate = `${splited[10]}`;
+          departTime = `${splited[7].slice(0, 2)}:${splited[7].slice(2, 4)}`;
+          destTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
+          departDate = `${splited[3]}`;
+          destDate = `${splited[9]}`;
           departDay = DAYS[dayNumber - 1];
 
           // * day logic
@@ -413,8 +439,8 @@ export default {
           } else destDay = DAYS[dayNumber];
           //
 
-          txt += `\n${airline} - *${flightNumber}* \n ${
-            departAirport === "Tel-aviv" ? "Tel-Aviv" : `(${departAirport})`
+          txt += `\n${airline} - *${flightNumber}* \n${
+            departAirport === "Tel-aviv" ? "Tel-Aviv" : `${departAirport}`
           } ${
             departAirport === "Tel-aviv" ? "" : `(${departAirportCode})`
           } - ${destAirport} (${destAirportCode}) \n${this.$t(
@@ -463,14 +489,14 @@ export default {
 *${this.$t("airfare")}:* \n${this.airfareTxt} \n\n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
         "change"
-      )} ${this.data.prices.restrictions.changeFee.value}${
-        this.selectedCurrency
-      } ${this.$t("p. p")}\n${this.$t("(+difference in fare)")} \n${this.$t(
-        "cancel"
-      )} ${this.data.prices.restrictions.cancelFee.value}${
-        this.selectedCurrency
-      } ${this.$t("p. p")} \n${this.$t("no show")} ${
-        this.data.prices.restrictions.noShowFee.value
+      )} ${
+        this.data.prices["Change Fees - hidden until text"][CHANGE_FEE].value
+      }${this.selectedCurrency} ${this.$t("p. p")}\n${this.$t(
+        "(+difference in fare)"
+      )} \n${this.$t("cancel")} ${
+        this.data.prices["cancel fee"].cancelFee.value
+      }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t("no show")} ${
+        this.data.prices["no show - hidden until text"][NO_SHOW_FEE].value
       }${this.selectedCurrency} ${this.$t("p. p")} \n\n*${this.$t(
         "details"
       )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n${this.$t(
@@ -495,6 +521,45 @@ export default {
     getAmountOfSpecificTraveler(travelerType) {
       return this.data.travelers.filter((tr) => tr.type === travelerType)
         .length;
+    },
+    checkIfDisplay(optionName) {
+      switch (optionName) {
+        case FAMILY_FARE:
+          return this.data.details.airfare.airfare.selected === FAMILY_FARE;
+        // * no show
+        case NO_SHOW_FEE:
+          return (
+            this.data.prices["no show - hidden until text"][
+              "no show - hidden until text"
+            ].selected === NO_SHOW_FEE ||
+            this.data.prices["no show - hidden until text"][
+              "no show - hidden until text"
+            ].selected === NO_SHOW_PLUS_CHANGE_FEE
+          );
+          break;
+        case NO_SHOW_PLUS_CHANGE_FEE:
+          return (
+            this.data.prices["no show - hidden until text"][
+              "no show - hidden until text"
+            ].selected === NO_SHOW_PLUS_CHANGE_FEE
+          );
+          break;
+        // * change fee
+        case CHANGE_FEE:
+          return (
+            this.data.prices["Change Fees - hidden until text"][
+              "Change Fees - hidden until text"
+            ].selected === "(+difference in fare)" ||
+            this.data.prices["Change Fees - hidden until text"][
+              "Change Fees - hidden until text"
+            ].selected ===
+              "price - Only permitted upon availability on Bonus Quota!"
+          );
+          break;
+
+        default:
+          return true;
+      }
     },
   },
   computed: {
@@ -544,10 +609,12 @@ export default {
     },
     airfareTxt() {
       const fare = this.data.details.airfare.airfare.selected;
-      if (fare === "family fare") {
-        return `${this.$t("family fare")} \n\n${this.$t(
-          "eco lite"
-        )} \n\n${this.$t("eco classic")} \n\n${this.$t("eco flex")}`;
+      if (fare === FAMILY_FARE) {
+        let txt = `${this.$t(FAMILY_FARE)}`;
+        this.data.details.airfare[FAMILY_FARE].selected.forEach(
+          (option) => (txt += `\n\n${this.$t(option)}`)
+        );
+        return txt;
       }
       return this.$t(fare);
     },
