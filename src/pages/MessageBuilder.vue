@@ -106,7 +106,16 @@
           autogrow
           placeholder="Outbound amadeus code"
         />
-        <!-- <h6 class="q-mb-sm">Outbound flights</h6>
+
+        <!-- <div class="flex items-center">
+          <h6 class="q-mb-sm q-mr-md">Other destination</h6>
+          <q-btn
+            style="height: 35px; width: 35px"
+            color="primary"
+            icon="add"
+            @click="onAddTraveler"
+          />
+        </div>
         <q-input
           class="q-mb-lg"
           v-model="data.outboundAmadeusCode"
@@ -114,6 +123,7 @@
           autogrow
           placeholder="Outbound amadeus code"
         /> -->
+
         <h6 class="q-mb-sm">Inbound flights</h6>
         <q-input
           v-model="data.inboundAmadeusCode"
@@ -267,12 +277,12 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode: "",
-        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
-        //         `2  AF1621 T 08JUL 4*TLVCDG HK1  1625 1955  08JUL  E  AF/UDWPNI
-        // 3  AF7728 T 08JUL 4*CDGNTE HK1  2110 2220  08JUL  E  AF/UDWPNI
-        // 4  AF7721 E 11JUL 7*NTECDG HK1  0600 0710  11JUL  E  AF/UDWPNI
-        // 5  AF1620 E 11JUL 7*CDGTLV HK1  0920 1435  11JUL  E  AF/UDWPNI`,
+        outboundAmadeusCode:
+          //  "",
+          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+  4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+  5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+  6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         inboundAmadeusCode: "",
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
@@ -381,19 +391,26 @@ export default {
           direction === "ALLER"
             ? this.$t("outbound flight")
             : this.$t("inbound flight");
-        lines = linesString
-          .split("AF")
-          .filter((item, idx) => idx % 2 === 1)
-          .map((item) => `AF${item}`);
+        // lines = linesString
+        //   .split("AF")
+        //   .filter((item, idx) => idx % 2 === 1)
+        //   .map((item) => `AF${item}`);
+        lines = linesString.split("\n");
+        console.log(lines);
+        let charsToFirstNumber
         lines.forEach((line, idx) => {
           if (!line) return;
+          charsToFirstNumber  = line.search(/\d/)
+          line = line.slice(charsToFirstNumber, line.length-1)
+          console.log(line)
           // * handles 4 numbers - ly1996
-          line = line.splice(2, 0, " ");
+          line = line.splice(5, 0, " ");
           // * handle * - 4*
-          line = line.splice(17, 1, " ");
+          line = line.splice(20, 1, " ");
 
           splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-          latterOfclassOfTravel = splited[2];
+          console.log(splited);
+          latterOfclassOfTravel = splited[3];
           let isInClass = false;
           for (const key in CLASSES_TYPE_MAP) {
             isInClass = CLASSES_TYPE_MAP[key].some(
@@ -408,22 +425,22 @@ export default {
           }
 
           airline = airlines.filter((item) => {
-            return item.IATA === splited[0];
+            return item.IATA === splited[1];
           })[0].name;
-          flightNumber = `${splited[0]}${splited[1]}`;
-          dayNumber = splited[4];
-          departAirportCode = splited[5].slice(0, 3);
-          destAirportCode = splited[5].slice(3, 6);
+          flightNumber = `${splited[1]}${splited[2]}`;
+          dayNumber = splited[5];
+          departAirportCode = splited[6].slice(0, 3);
+          destAirportCode = splited[6].slice(3, 6);
           this.data.journey.push(
             index.lookupByIataCode(departAirportCode).city
           );
           this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
           departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
           destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-          departTime = `${splited[7].slice(0, 2)}:${splited[7].slice(2, 4)}`;
-          destTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-          departDate = `${splited[3]}`;
-          destDate = `${splited[9]}`;
+          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
+          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
+          departDate = `${splited[4]}`;
+          destDate = `${splited[10]}`;
           departDay = DAYS[dayNumber - 1];
 
           // * day logic
