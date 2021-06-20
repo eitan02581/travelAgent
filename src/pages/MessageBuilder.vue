@@ -106,6 +106,14 @@
           autogrow
           placeholder="Outbound amadeus code"
         />
+        <!-- <h6 class="q-mb-sm">Outbound flights</h6>
+        <q-input
+          class="q-mb-lg"
+          v-model="data.outboundAmadeusCode"
+          filled
+          autogrow
+          placeholder="Outbound amadeus code"
+        /> -->
         <h6 class="q-mb-sm">Inbound flights</h6>
         <q-input
           v-model="data.inboundAmadeusCode"
@@ -486,7 +494,7 @@ export default {
 *${this.$t("airline")}* \n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
 *${this.$t("prices")}:* \n${this.priceDetails} \n\n
-*${this.$t("airfare")}:* \n${this.airfareTxt} \n\n
+*${this.$t("airfare")}:* \n${this.airfareTxt} \n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
         "change"
       )} ${
@@ -610,11 +618,15 @@ export default {
     airfareTxt() {
       const fare = this.data.details.airfare.airfare.selected;
       if (fare === FAMILY_FARE) {
-        let txt = `${this.$t(FAMILY_FARE)}`;
-        this.data.details.airfare[FAMILY_FARE].selected.forEach(
-          (option) => (txt += `\n\n${this.$t(option)}`)
-        );
-        return txt;
+        let introFamilyFareTxt = `${this.$t(FAMILY_FARE)}`,
+          optionsFamilyFareTxt = ``,
+          fareDetailsTxt = ``;
+        this.data.details.airfare[FAMILY_FARE].selected.forEach((option) => {
+          optionsFamilyFareTxt += `${this.$t(`option-${option}`)}`;
+          console.log(option);
+          fareDetailsTxt += `\n${this.$t(option)}\n`;
+        });
+        return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
       }
       return this.$t(fare);
     },

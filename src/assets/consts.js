@@ -14,7 +14,7 @@ export const TRAVELER_TYPES = [
 export const CLASSES_TYPE_MAP = {
     "BUSINESS Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
     "PREMIUM Cl.": ["W", "Q", "B", "P", "A"],
-    "ECONOMY Cl.": ["Y", "M","T", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
+    "ECONOMY Cl.": ["Y", "M", "T", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
 }
 export const LANGS = [
     { label: "English", value: "en" },
@@ -232,3 +232,4 @@ export const FORM_ITEMS = {
         },
     }
 }
+
