@@ -6,6 +6,7 @@ export default {
     "francais": "Francais",
     "hebrew": "עברית",
     "outbound flight": "Outbound flight(s) 🛫",
+    "other destination flight": "Other destination flight(s) ✈️",
     "inbound flight": "Inbound flight(s) 🛬",
     "together with": "together with",
     "itinerary": "Itinerary:",

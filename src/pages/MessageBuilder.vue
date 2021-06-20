@@ -106,24 +106,40 @@
           autogrow
           placeholder="Outbound amadeus code"
         />
-
-        <!-- <div class="flex items-center">
-          <h6 class="q-mb-sm q-mr-md">Other destination</h6>
-          <q-btn
-            style="height: 35px; width: 35px"
-            color="primary"
-            icon="add"
-            @click="onAddTraveler"
+        <div v-for="(destination, idxx) in data.otherDestinations" :key="idxx">
+          <div class="flex items-center q-mb-sm">
+            <h6 class="q-mb-sm q-mr-md">Other destination {{ idxx + 1 }}</h6>
+            <q-btn
+              v-if="data.otherDestinations.length === idxx + 1"
+              style="height: 20px; width: 35px; font-size: 8px"
+              color="primary"
+              icon="add"
+              @click="onAddDestination"
+            />
+            <q-btn
+              style="
+                font-size: 7px;
+                right: 13px;
+                position: absolute;
+                height: 15x;
+                width: 22px;
+                height: 22px;
+              "
+              round
+              v-if="idxx !== 0"
+              color="primary"
+              icon="cancel"
+              @click="onRemoveDestination(idxx)"
+            />
+          </div>
+          <q-input
+            class="q-mb-lg"
+            v-model="data.otherDestinations[idxx]"
+            filled
+            autogrow
+            :placeholder="`Other destination ${idxx + 1}`"
           />
         </div>
-        <q-input
-          class="q-mb-lg"
-          v-model="data.outboundAmadeusCode"
-          filled
-          autogrow
-          placeholder="Outbound amadeus code"
-        /> -->
-
         <h6 class="q-mb-sm">Inbound flights</h6>
         <q-input
           v-model="data.inboundAmadeusCode"
@@ -277,13 +293,13 @@ export default {
         // ! debug
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode:
-           "",
-  //         `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-  // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-  // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-  // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+        outboundAmadeusCode: "",
+        //         `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         inboundAmadeusCode: "",
+        otherDestinations: [""],
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
         classOfTravel: "",
@@ -366,6 +382,14 @@ export default {
         (traveler, index) => index !== idx
       );
     },
+    onAddDestination() {
+      this.data.otherDestinations.push("");
+    },
+    onRemoveDestination(idxx) {
+      this.data.otherDestinations = this.data.otherDestinations.filter(
+        (item, idx) => idx !== idxx
+      );
+    },
     getAmadeusTranslate(direction, linesString) {
       if (linesString.length) {
         let lines,
@@ -387,20 +411,23 @@ export default {
           destDate,
           dayNumber,
           txt = "";
+
         way =
           direction === "ALLER"
             ? this.$t("outbound flight")
+            : direction === "OTHER_DEST"
+            ? this.$t("other destination flight")
             : this.$t("inbound flight");
         // lines = linesString
         //   .split("AF")
         //   .filter((item, idx) => idx % 2 === 1)
         //   .map((item) => `AF${item}`);
         lines = linesString.split("\n");
-        let charsToFirstNumber
+        let charsToFirstNumber;
         lines.forEach((line, idx) => {
           if (!line) return;
-          charsToFirstNumber  = line.search(/\d/)
-          line = line.slice(charsToFirstNumber, line.length-1)
+          charsToFirstNumber = line.search(/\d/);
+          line = line.slice(charsToFirstNumber, line.length - 1);
           // * handles 4 numbers - ly1996
           line = line.splice(5, 0, " ");
           // * handle * - 4*
@@ -461,10 +488,8 @@ export default {
           } else destDay = DAYS[dayNumber];
           //
 
-          txt += `\n${airline} - *${flightNumber}* \n${
-            departAirport === "Tel-aviv" ? "Tel-Aviv" : `${departAirport}`
-          } ${
-            departAirport === "Tel-aviv" ? "" : `(${departAirportCode})`
+          txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
+            departAirport === "Tel-Aviv" ? "" : `(${departAirportCode})`
           } - ${destAirport} (${destAirportCode}) \n${this.$t(
             `${flightClass}`
           )} \n ${this.$t("dpt.")} ${this.$t(
@@ -477,7 +502,10 @@ export default {
       } else return "";
     },
     onPreview() {
-      let departTxt, destTxt, otherTravelers;
+      let departTxt,
+        OtherDestTxt = "",
+        destTxt,
+        otherTravelers;
       this.data.journey = [];
       this.data.classOfTravel = "";
 
@@ -485,6 +513,14 @@ export default {
         "ALLER",
         this.data.outboundAmadeusCode
       );
+
+      this.data.otherDestinations.forEach((input, idx) => {
+        if (!input) return;
+
+        OtherDestTxt +=
+          this.getAmadeusTranslate("OTHER_DEST", input) +
+          (idx < this.data.otherDestinations.length - 1 ? "\n" : "");
+      });
       destTxt = this.getAmadeusTranslate(
         "RETOUR",
         this.data.inboundAmadeusCode
@@ -504,7 +540,7 @@ export default {
           : ""
       } \n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
         this.data.details.itinerary.itinerary.selected
-      } \n${departTxt} \n${destTxt}
+      } \n${departTxt} \n${OtherDestTxt} \n${destTxt}
 *${this.$t("airline")}* \n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
 *${this.$t("prices")}:* \n${this.priceDetails} \n\n

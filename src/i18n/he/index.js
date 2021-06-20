@@ -4,6 +4,7 @@ export default {
   "francais": "HE - Francais",
   "hebrew": "HE - עברית",
   "outbound flight": "טיסות יוצאות 🛫",
+  "other destination flight": "HE - other destination flight(s) ✈️",
   "inbound flight": "טיסות נכנסות 🛬",
   "together with": "HE - together with",
   "itinerary": "מסלול",
