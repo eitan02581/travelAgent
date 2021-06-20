@@ -278,11 +278,11 @@ export default {
         // amadeusCode:
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
         outboundAmadeusCode:
-          //  "",
-          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-  4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-  5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-  6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+           "",
+  //         `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+  // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+  // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+  // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         inboundAmadeusCode: "",
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
         journey: [],
@@ -396,20 +396,17 @@ export default {
         //   .filter((item, idx) => idx % 2 === 1)
         //   .map((item) => `AF${item}`);
         lines = linesString.split("\n");
-        console.log(lines);
         let charsToFirstNumber
         lines.forEach((line, idx) => {
           if (!line) return;
           charsToFirstNumber  = line.search(/\d/)
           line = line.slice(charsToFirstNumber, line.length-1)
-          console.log(line)
           // * handles 4 numbers - ly1996
           line = line.splice(5, 0, " ");
           // * handle * - 4*
           line = line.splice(20, 1, " ");
 
           splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-          console.log(splited);
           latterOfclassOfTravel = splited[3];
           let isInClass = false;
           for (const key in CLASSES_TYPE_MAP) {
@@ -640,7 +637,6 @@ export default {
           fareDetailsTxt = ``;
         this.data.details.airfare[FAMILY_FARE].selected.forEach((option) => {
           optionsFamilyFareTxt += `${this.$t(`option-${option}`)}`;
-          console.log(option);
           fareDetailsTxt += `\n${this.$t(option)}\n`;
         });
         return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
