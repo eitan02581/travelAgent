@@ -41,7 +41,7 @@ export default {
   "none": " HE -  None",
   "baggage": " HE -  -Baggage:",
   "meal": " HE -  -Meal:",
-  "attention": " HE -  *Attention:* ❗",
+  "attention": " HE -  *Attention:*❗",
   "total": " HE -  total:",
   "airline": " HE - Airline::",
   "class of travel": " HE - class of travel:",

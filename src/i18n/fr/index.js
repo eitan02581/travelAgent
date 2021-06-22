@@ -41,7 +41,7 @@ export default {
   "none": " FR - None",
   "baggage": " FR - -Baggage:",
   "meal": " FR - -Meal:",
-  "attention": " FR - *Attention:* ❗",
+  "attention": " FR - *Attention:*❗",
   "total": " FR - total:",
   "class of travel": " FR - class of travel:",
 

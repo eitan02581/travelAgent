@@ -59,7 +59,7 @@
               style="min-width: 160px; position: relative"
               class="flex space-between"
             >
-              <h6>Traveler {{ idx + 1 }}</h6>
+              <h6 class="q-mb-none">Traveler {{ idx + 1 }}</h6>
               <q-btn
                 style="font-size: 9px; right: 13px; position: absolute"
                 round
@@ -148,20 +148,30 @@
           placeholder="Inbound amadeus code"
         />
       </div>
-
+      <q-tabs
+        v-model="selectedTemplateTab"
+        inline-label
+        class="q-mt-xl bg-purple text-white shadow-2"
+      >
+        <q-tab name="All" label="All" />
+        <q-tab name="Multi tickets" label="Multi tickets" />
+        <q-tab name="Family fare" label="Family fare" />
+      </q-tabs>
       <section class="">
         <div
-          class="q-mt-xl"
-          v-for="(items, boxName) in formStructure"
+          class=""
+          v-for="(items, boxName, idx) in formStructure"
           :key="boxName"
         >
           <h5
             class="bg-secondary text-white text-center q-py-sm q-mb-lg"
-            style="opacity: 0.73; margin-top: 48px"
+            style="opacity: 0.73"
+            :style="{ 'margin-top': idx === 0 ? '' : '48px' }"
           >
             {{ boxName }}
           </h5>
           <div
+            v-if="checkIfDisplay(boxName, item)"
             class="q-mt-md q-px-sm"
             v-for="(item, index) in items"
             :key="item"
@@ -176,7 +186,7 @@
                 v-if="
                   option.type === 'input' &&
                   !option.hide &&
-                  checkIfDisplay(optionName)
+                  checkIfDisplaySubInput(optionName)
                 "
                 class="q-mt-sm"
                 v-model.number="option.value"
@@ -189,7 +199,8 @@
 
               <q-select
                 v-else-if="
-                  option.type === 'selectMultiple' && checkIfDisplay(optionName)
+                  option.type === 'selectMultiple' &&
+                  checkIfDisplaySubInput(optionName)
                 "
                 filled
                 :type="option.type"
@@ -207,7 +218,7 @@
               />
               <q-select
                 v-else-if="
-                  option.type === 'select' && checkIfDisplay(optionName)
+                  option.type === 'select' && checkIfDisplaySubInput(optionName)
                 "
                 filled
                 :type="option.type"
@@ -272,6 +283,7 @@ import {
   NO_SHOW_FEE,
   NO_SHOW_PLUS_CHANGE_FEE,
   CHANGE_FEE,
+  ORDER,
 } from "src/assets/consts.js";
 
 import { airlines } from "src/assets/airlines_big.js";
@@ -280,6 +292,7 @@ export default {
   data() {
     return {
       tab: "info",
+      selectedTemplateTab: "All",
       contactListApiSupported: false,
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
@@ -290,14 +303,12 @@ export default {
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
-        // ! debug
-        // amadeusCode:
-        // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ  ",
-        outboundAmadeusCode: "",
-        //         `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+        outboundAmadeusCode:
+          //  "",
+          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+        4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+        5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+        6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         inboundAmadeusCode: "",
         otherDestinations: [""],
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
@@ -418,10 +429,6 @@ export default {
             : direction === "OTHER_DEST"
             ? this.$t("other destination flight")
             : this.$t("inbound flight");
-        // lines = linesString
-        //   .split("AF")
-        //   .filter((item, idx) => idx % 2 === 1)
-        //   .map((item) => `AF${item}`);
         lines = linesString.split("\n");
         let charsToFirstNumber;
         lines.forEach((line, idx) => {
@@ -489,16 +496,16 @@ export default {
           //
 
           txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
-            departAirport === "Tel-Aviv" ? "" : `(${departAirportCode})`
-          } - ${destAirport} (${destAirportCode}) \n${this.$t(
-            `${flightClass}`
-          )} \n ${this.$t("dpt.")} ${this.$t(
+            departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
+          } ➡️ ${destAirport} ${
+            destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
+          } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
             `${departDay}`
           )} ${departDate} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
             `${destDay}`
-          )} ${destDate} ${destTime} \n`;
+          )} ${destDate} ${destTime}\n   ${this.$t("seat number")} \n`;
         });
-        return `${way} ${txt}`;
+        return `*${way}* ${txt}`;
       } else return "";
     },
     onPreview() {
@@ -531,41 +538,89 @@ export default {
         .map((traveler) => this.capitalizeFirstLetter(traveler.name))
         .join(", ");
 
-      this.whatsappMessage = `${this.capitalizeFirstLetter(
-        this.data.travelers[0].name
-      )}, ${this.$t("shalom")} 
-        \n\n${this.$t("flight desc")} \n${this.journeyTxt}\n${
-        this.data.travelers.length >= 2
-          ? `${this.$t("together with")} ${otherTravelers}`
-          : ""
-      } \n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
-        this.data.details.itinerary.itinerary.selected
-      } \n${departTxt} \n${OtherDestTxt} \n${destTxt}
-*${this.$t("airline")}* \n\n
+      switch (this.selectedTemplateTab) {
+        case "All":
+          this.whatsappMessage = `*${this.capitalizeFirstLetter(
+            this.data.travelers[0].name
+          )}*, ${this.$t("shalom")} 
+    \n\n${this.$t("flight desc")} \n${this.journeyTxt}\n${
+            this.data.travelers.length >= 2
+              ? `${this.$t("together with")} ${otherTravelers}`
+              : ""
+          } \n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+            this.data.details.itinerary.itinerary.selected
+          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
+            this.ticketingOptionsTxt
+          }
+*${this.$t("airline")}* (xx)\n*xxx*\n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
 *${this.$t("prices")}:* \n${this.priceDetails} \n\n
 *${this.$t("airfare")}:* \n${this.airfareTxt} \n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
-        "change"
-      )} ${
-        this.data.prices["Change Fees - hidden until text"][CHANGE_FEE].value
-      }${this.selectedCurrency} ${this.$t("p. p")}\n${this.$t(
-        "(+difference in fare)"
-      )} \n${this.$t("cancel")} ${
-        this.data.prices["cancel fee"].cancelFee.value
-      }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t("no show")} ${
-        this.data.prices["no show - hidden until text"][NO_SHOW_FEE].value
-      }${this.selectedCurrency} ${this.$t("p. p")} \n\n*${this.$t(
-        "details"
-      )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n${this.$t(
-        "baggage"
-      )} 🧳 ${this.totalBaggage} \n\n${this.$t(
-        "meal"
-      )} 🍴 ${this.data.details.food.food.selected.map(
-        (meal) => `\n${this.$t(meal)}`
-      )} \n\n${this.$t("attention")} \n${this.$t(
-        "price may change"
-      )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
+            "change"
+          )} ${this.changeFeeValue} ${this.$t("p. p")}\n${this.$t("cancel")} ${
+            this.data.prices["cancel fee"].cancelFee.value
+          }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
+            "no show"
+          )} ${this.noShowValue} ${this.$t("p. p")} \n\n*${this.$t(
+            "details"
+          )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n*${this.$t(
+            "baggage"
+          )}* 🧳 ${this.totalBaggage} \n\n*${this.$t(
+            "meal"
+          )}* 🍴 ${this.data.details.food.food.selected.map(
+            (meal) => `\n${this.$t(meal)}`
+          )} \n\n${this.$t("attention")} \n${this.$t(
+            "price may change"
+          )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
+          break;
+
+        case "Multi tickets":
+          this.whatsappMessage = `*${this.capitalizeFirstLetter(
+            this.data.travelers[0].name
+          )}*, ${this.$t("shalom")} 
+        \n\n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
+            this.journeyTxt
+          }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+            this.data.details.itinerary.itinerary.selected
+          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
+            this.ticketingOptionsTxt
+          } \n${this.$t("price may change")} \n\n${this.$t(
+            "please pay again msg"
+          )} \n\n${this.$t("farewell")}`;
+          break;
+
+        case "Family fare":
+          this.whatsappMessage = `*${this.capitalizeFirstLetter(
+            this.data.travelers[0].name
+          )}*, ${this.$t("shalom")} 
+        \n\n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
+            this.journeyTxt
+          }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+            this.data.details.itinerary.itinerary.selected
+          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
+            this.ticketingOptionsTxt
+          }*${this.$t("airline")}* (xx)\n*xxx*\n
+*${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n*${this.$t(
+            "airfare"
+          )}:* \n${this.airfareTxt} \n\n*${this.$t(
+            "restrictions"
+          )}:*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
+            this.changeFeeValue
+          } ${this.$t("p. p")} \n${this.$t("cancel")} ${
+            this.data.prices["cancel fee"].cancelFee.value
+          }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
+            "no show"
+          )} ${this.noShowValue} ${this.$t("p. p")} \n\n${this.$t(
+            "attention"
+          )} \n${this.$t("price may change")} \n\n${this.$t(
+            "please pay again msg"
+          )} \n\n${this.$t("farewell")}`;
+          break;
+
+        default:
+          break;
+      }
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -580,38 +635,39 @@ export default {
       return this.data.travelers.filter((tr) => tr.type === travelerType)
         .length;
     },
-    checkIfDisplay(optionName) {
+    checkIfDisplay(boxName, item) {
+      const tempalteToShow = this.data[boxName][item].templatesToBeDisplayIn;
+      if (this.selectedTemplateTab === "All") return true;
+      if (!tempalteToShow) return true;
+      return tempalteToShow.includes(this.selectedTemplateTab);
+    },
+    checkIfDisplaySubInput(optionName) {
       switch (optionName) {
         case FAMILY_FARE:
           return this.data.details.airfare.airfare.selected === FAMILY_FARE;
         // * no show
         case NO_SHOW_FEE:
           return (
-            this.data.prices["no show - hidden until text"][
-              "no show - hidden until text"
-            ].selected === NO_SHOW_FEE ||
-            this.data.prices["no show - hidden until text"][
-              "no show - hidden until text"
-            ].selected === NO_SHOW_PLUS_CHANGE_FEE
+            this.data.prices["no show"]["no show"].selected === NO_SHOW_FEE ||
+            this.data.prices["no show"]["no show"].selected ===
+              NO_SHOW_PLUS_CHANGE_FEE
           );
           break;
         case NO_SHOW_PLUS_CHANGE_FEE:
           return (
-            this.data.prices["no show - hidden until text"][
-              "no show - hidden until text"
-            ].selected === NO_SHOW_PLUS_CHANGE_FEE
+            this.data.prices["no show"]["no show"].selected ===
+            NO_SHOW_PLUS_CHANGE_FEE
           );
           break;
         // * change fee
         case CHANGE_FEE:
           return (
-            this.data.prices["Change Fees - hidden until text"][
-              "Change Fees - hidden until text"
+            this.data.prices["Change fees"][
+              "Change fees"
             ].selected === "(+difference in fare)" ||
-            this.data.prices["Change Fees - hidden until text"][
-              "Change Fees - hidden until text"
-            ].selected ===
-              "price - Only permitted upon availability on Bonus Quota!"
+            this.data.prices["Change fees"][
+              "Change fees"
+            ].selected === "Only permitted upon availability on Bonus Quota!"
           );
           break;
 
@@ -641,43 +697,112 @@ export default {
       }
       return total;
     },
+    noShowValue() {
+      const noShowSelection = this.data.prices["no show"]["no show"].selected;
+      switch (noShowSelection) {
+        case "total loss":
+          return this.$t("total loss");
+        case NO_SHOW_FEE:
+          return this.data.prices["no show"][NO_SHOW_FEE].value;
+        case NO_SHOW_PLUS_CHANGE_FEE:
+          const noShowFee = this.data.prices["no show"][NO_SHOW_FEE].value;
+          const changeFee =
+            this.data.prices["no show"][NO_SHOW_PLUS_CHANGE_FEE].value;
+          return `${noShowFee}${this.selectedCurrency} + ${this.$t(
+            "change fee"
+          )}: ${changeFee}`;
+
+        default:
+          return `0${this.selectedCurrency}`
+          break;
+      }
+    },
+    changeFeeValue() {
+      const changeFeeSelection =
+        this.data.prices["Change fees"][
+          "Change fees"
+        ].selected;
+      const changeFeeValue =
+        this.data.prices["Change fees"][CHANGE_FEE].value;
+      switch (changeFeeSelection) {
+        case "Non Changeable":
+          return this.$t("Non Changeable");
+        case "(+difference in fare)":
+          return `${changeFeeValue}${this.selectedCurrency}\n       ${this.$t(
+            "(+difference in fare)"
+          )}`;
+        case "Only permitted upon availability on Bonus Quota!":
+          return `${changeFeeValue}${this.selectedCurrency}\n       ${this.$t(
+            "Only permitted upon availability on Bonus Quota!"
+          )}`;
+
+        default:
+          return `0${this.selectedCurrency}`
+          break;
+      }
+    },
     totalBaggage() {
       return this.data.details.baggage.baggage.selected.join(", ");
     },
-    priceDetails() {
-      let priceTxt = ``,
-        passanger;
-      for (const key in this.travelersTypeAmountMap) {
-        priceTxt += `${this.data.prices.price[key].value}${
-          this.selectedCurrency
-        } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
+    // priceDetails() {
+    //   let priceTxt = ``,
+    //     passanger;
+    //   for (const key in this.travelersTypeAmountMap) {
+    //     priceTxt += `${this.data.prices.price[key].value}${
+    //       this.selectedCurrency
+    //     } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
+    //   }
+    //   priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
+    //     this.selectedCurrency
+    //   }`;
+    //   return priceTxt;
+    // },
+    allNamesTxt() {
+      // your upcoming flight
+      let txt = `${this.$t("your")}`;
+      if (this.data.travelers.length === 1) txt += "s ";
+      else {
+        this.data.travelers.forEach((traveler, idx) => {
+          if (idx === 0) return;
+          // * first traveler is the the "your" above
+          txt += " & " + this.capitalizeFirstLetter(traveler.name);
+        });
+        txt = `*${txt}\'s* `;
       }
-      priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
-        this.selectedCurrency
-      }`;
-      return priceTxt;
+
+      return txt + this.$t("upcoming trip to");
     },
     journeyTxt() {
       let txt = "";
-      this.data.journey.forEach(
+      let uniqeDestinations;
+      uniqeDestinations = this.data.journey.filter(
+        (item, idx, array) => array.indexOf(item) === idx
+      );
+
+      uniqeDestinations.forEach(
         (place, idx) =>
-          (txt += `${place} ${idx < this.data.journey.length - 1 ? "> " : ""}`)
+          (txt += `${place}${idx < uniqeDestinations.length - 1 ? ", " : ""}`)
       );
       return txt;
     },
     airfareTxt() {
-      const fare = this.data.details.airfare.airfare.selected;
-      if (fare === FAMILY_FARE) {
-        let introFamilyFareTxt = `${this.$t(FAMILY_FARE)}`,
-          optionsFamilyFareTxt = ``,
-          fareDetailsTxt = ``;
-        this.data.details.airfare[FAMILY_FARE].selected.forEach((option) => {
-          optionsFamilyFareTxt += `${this.$t(`option-${option}`)}`;
-          fareDetailsTxt += `\n${this.$t(option)}\n`;
-        });
-        return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
+      let introFamilyFareTxt = `${this.$t(FAMILY_FARE)}`,
+        optionsFamilyFareTxt = ``,
+        fareDetailsTxt = ``;
+      this.data.details.airfare[FAMILY_FARE].selected.forEach((option, idx) => {
+        optionsFamilyFareTxt += `${idx + 1}. ${this.$t(`option-${option}`)}`;
+        fareDetailsTxt += `\n${this.$t(option)}\n`;
+      });
+      return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
+    },
+    ticketingOptionsTxt() {
+      let txt = "";
+      const numOfTicketingOptions =
+        this.data.prices["multi tickets"].numOfTicketOptions.value;
+      for (let num = 0; num < numOfTicketingOptions; num++) {
+        txt += `*${ORDER[num]} ${this.$t("ticket option details")} \n`;
       }
-      return this.$t(fare);
+      return txt;
     },
   },
   watch: {
@@ -694,6 +819,11 @@ export default {
       },
       deep: true,
       immediate: true,
+    },
+    selectedTemplateTab(tab) {
+      if (tab === "Family fare") {
+        this.data.details.airfare.airfare.selected = "Family fare";
+      } else this.data.details.airfare.airfare.selected = "";
     },
   },
 };
