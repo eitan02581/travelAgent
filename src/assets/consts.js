@@ -25,7 +25,7 @@ export const LANGS = [
 ]
 
 export const FORM_STRUCTURE = {
-    prices: ["price", "multi tickets", "currency", "cancel fee", "Change fees", "no show"],
+    prices: ["price", "multi tickets", "currency", "cancel fee", "Change fees", "no show", "​ticket issuance"],
     details: [
         "itinerary",
         "carrier Type - hidden until text",
@@ -118,6 +118,20 @@ export const FORM_ITEMS = {
                 type: "input"
             },
         },
+        "​ticket issuance": {
+            templatesToBeDisplayIn: ["Family fare"],
+            "​ticket issuance": {
+                options: [
+                    { label: "Today", value: "Today" },
+                    { label: "Immediate", value: "Immediate" },
+                    { label: "Within 24h", value: "Within 24h" },
+                    { label: "Within 48h", value: "Within 48h" },
+                    { label: "Within 72h", value: "Within 72h" },
+                ],
+                selected: "",
+                type: "select",
+            },
+        }
     },
     details: {
         itinerary: {

@@ -494,16 +494,21 @@ export default {
             destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
           } else destDay = DAYS[dayNumber];
           //
-
           txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
             departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
           } ➡️ ${destAirport} ${
             destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
           } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
             `${departDay}`
-          )} ${departDate} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
+          )}${this.getRightSpaceAlignment(
+            departDay
+          )} ${departDate}${this.getRightSpaceAlignment(
+            departMonth
+          )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
             `${destDay}`
-          )} ${destDate} ${destTime}\n   ${this.$t("seat number")} \n`;
+          )}${this.getRightSpaceAlignment(destDay)} ${destDate}${this.getRightSpaceAlignment(
+            destMonth
+          )} ${destTime}\n   ${this.$t("seat number")} \n`;
         });
         return `*${way}* ${txt}`;
       } else return "";
@@ -538,6 +543,8 @@ export default {
         .map((traveler) => this.capitalizeFirstLetter(traveler.name))
         .join(", ");
 
+      // *${this.$t("prices")}:* \n${this.priceDetails} \n\n
+
       switch (this.selectedTemplateTab) {
         case "All":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
@@ -554,7 +561,6 @@ export default {
           }
 *${this.$t("airline")}* (xx)\n*xxx*\n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
-*${this.$t("prices")}:* \n${this.priceDetails} \n\n
 *${this.$t("airfare")}:* \n${this.airfareTxt} \n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
             "change"
@@ -562,11 +568,13 @@ export default {
             this.data.prices["cancel fee"].cancelFee.value
           }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
             "no show"
-          )} ${this.noShowValue} ${this.$t("p. p")} \n\n*${this.$t(
-            "details"
-          )}* \n${this.$t("compartment")} ${this.$t("none")} \n\n*${this.$t(
-            "baggage"
-          )}* 🧳 ${this.totalBaggage} \n\n*${this.$t(
+          )} ${this.noShowValue} ${this.$t("p. p")} \n*${this.$t(
+            "ticket issuance"
+          )}: ${this.$t(
+            this.data.prices["​ticket issuance"]["​ticket issuance"].selected
+          )}* \n\n*${this.$t("details")}* \n\n*${this.$t("baggage")}* 🧳 ${
+            this.totalBaggage
+          } \n\n*${this.$t(
             "meal"
           )}* 🍴 ${this.data.details.food.food.selected.map(
             (meal) => `\n${this.$t(meal)}`
@@ -611,11 +619,13 @@ export default {
             this.data.prices["cancel fee"].cancelFee.value
           }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
             "no show"
-          )} ${this.noShowValue} ${this.$t("p. p")} \n\n${this.$t(
-            "attention"
-          )} \n${this.$t("price may change")} \n\n${this.$t(
-            "please pay again msg"
-          )} \n\n${this.$t("farewell")}`;
+          )} ${this.noShowValue} ${this.$t("p. p")} \n*${this.$t(
+            "ticket issuance"
+          )}: ${this.$t(
+            this.data.prices["​ticket issuance"]["​ticket issuance"].selected
+          )}* \n\n${this.$t("attention")} \n${this.$t(
+            "price may change"
+          )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
           break;
 
         default:
@@ -662,17 +672,59 @@ export default {
         // * change fee
         case CHANGE_FEE:
           return (
-            this.data.prices["Change fees"][
-              "Change fees"
-            ].selected === "(+difference in fare)" ||
-            this.data.prices["Change fees"][
-              "Change fees"
-            ].selected === "Only permitted upon availability on Bonus Quota!"
+            this.data.prices["Change fees"]["Change fees"].selected ===
+              "(+difference in fare)" ||
+            this.data.prices["Change fees"]["Change fees"].selected ===
+              "Only permitted upon availability on Bonus Quota!"
           );
           break;
 
         default:
           return true;
+      }
+    },
+    getRightSpaceAlignment(str) {
+      console.log(str);
+      str = str.toLowerCase();
+      switch (str) {
+        case "sun":
+          return "  ";
+        case "tue":
+          return " ";
+        case "thu":
+          return " ";
+        case "fri":
+          return "   ";
+        case "sat":
+          return "  ";
+        // * months
+        case "jan":
+          return "";
+        case "feb":
+          return " ";
+        case "mar":
+          return "";
+        case "apr":
+          return " ";
+        case "may":
+          return "";
+        case "jun":
+          return " ";
+        case "jul":
+          return " ";
+        case "aug":
+          return "";
+        case "sep":
+          return " ";
+        case "oct":
+          return "";
+        case "nov":
+          return " ";
+        case "dec":
+          return "";
+
+        default:
+          return "";
       }
     },
   },
@@ -713,17 +765,14 @@ export default {
           )}: ${changeFee}`;
 
         default:
-          return `0${this.selectedCurrency}`
+          return `0${this.selectedCurrency}`;
           break;
       }
     },
     changeFeeValue() {
       const changeFeeSelection =
-        this.data.prices["Change fees"][
-          "Change fees"
-        ].selected;
-      const changeFeeValue =
-        this.data.prices["Change fees"][CHANGE_FEE].value;
+        this.data.prices["Change fees"]["Change fees"].selected;
+      const changeFeeValue = this.data.prices["Change fees"][CHANGE_FEE].value;
       switch (changeFeeSelection) {
         case "Non Changeable":
           return this.$t("Non Changeable");
@@ -737,7 +786,7 @@ export default {
           )}`;
 
         default:
-          return `0${this.selectedCurrency}`
+          return `0${this.selectedCurrency}`;
           break;
       }
     },
