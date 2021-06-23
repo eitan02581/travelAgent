@@ -28,7 +28,7 @@
           <q-input
             :style="{ 'margin-right': contactListApiSupported ? '20px' : '' }"
             style="flex: 1"
-            class="q-mb-xl"
+            class="q-mb-md"
             v-model="data.whatsappNumber"
             label="contact WhatsApp"
           />
@@ -304,11 +304,11 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         outboundAmadeusCode:
-          //  "",
-          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-        4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-        5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-        6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+           "",
+        //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         inboundAmadeusCode: "",
         otherDestinations: [""],
         // "2  LY 007 U 31MAY 1 TLVJFK HK1  1330 1820  31MAY  E  LY/SF7DIJ \n3  LY 028 U 16JUN 3 EWRTLV HK1  1330 0655  17JUN  E  LY/SF7DIJ",
@@ -506,7 +506,9 @@ export default {
             departMonth
           )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
             `${destDay}`
-          )}${this.getRightSpaceAlignment(destDay)} ${destDate}${this.getRightSpaceAlignment(
+          )}${this.getRightSpaceAlignment(
+            destDay
+          )} ${destDate}${this.getRightSpaceAlignment(
             destMonth
           )} ${destTime}\n   ${this.$t("seat number")} \n`;
         });
@@ -593,9 +595,7 @@ export default {
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
             this.ticketingOptionsTxt
-          } \n${this.$t("price may change")} \n\n${this.$t(
-            "please pay again msg"
-          )} \n\n${this.$t("farewell")}`;
+          }${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
           break;
 
         case "Family fare":
@@ -762,7 +762,7 @@ export default {
             this.data.prices["no show"][NO_SHOW_PLUS_CHANGE_FEE].value;
           return `${noShowFee}${this.selectedCurrency} + ${this.$t(
             "change fee"
-          )}: ${changeFee}`;
+          )}: ${changeFee}${this.selectedCurrency}`;
 
         default:
           return `0${this.selectedCurrency}`;
@@ -873,6 +873,9 @@ export default {
       if (tab === "Family fare") {
         this.data.details.airfare.airfare.selected = "Family fare";
       } else this.data.details.airfare.airfare.selected = "";
+      if (tab === "Multi tickets") {
+        this.data.prices["multi tickets"].numOfTicketOptions.value = 1;
+      } else this.data.prices["multi tickets"].numOfTicketOptions.value = 0;
     },
   },
 };
