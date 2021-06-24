@@ -34,7 +34,6 @@ export const FORM_STRUCTURE = {
         "food",
         "Not included in price - hidden until text",
         "optional Supplement - hidden until text",
-        "ticket Issuance Time Limit - hidden until text",
     ],
 }
 // * list of words to prevent misspelling and mismatches
@@ -248,20 +247,6 @@ export const FORM_ITEMS = {
                 ],
                 selected: [],
                 type: "selectMultiple",
-            },
-        },
-        "ticket Issuance Time Limit - hidden until text": {
-            templatesToBeDisplayIn: ["all"],
-            "ticket Issuance Time Limit - hidden until text": {
-                options: [
-                    { label: "Immediate Purchase", value: "airfare - Immediate Purchase" },
-                    { label: "Today before (time) ", value: "airfare - Today before (time)" },
-                    { label: "Within 24h", value: "airfare - Within 24h" },
-                    { label: "Within 48h", value: "airfare - Within 48h" },
-                    { label: "Within 72h", value: "airfare - Within 72h" },
-                ],
-                selected: "",
-                type: "select",
             },
         },
     }

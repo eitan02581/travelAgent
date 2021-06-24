@@ -303,10 +303,9 @@ export default {
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
-        outboundAmadeusCode:
-           "",
-  //         `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-  // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
+        outboundAmadeusCode: "",
+        //         `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+        // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
         // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
@@ -658,6 +657,7 @@ export default {
         OtherDestTxt = "",
         destTxt,
         otherTravelers;
+
       this.data.journey = [];
       this.data.classOfTravel = "";
 
@@ -689,61 +689,61 @@ export default {
         case "All":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
-          )}*, ${this.$t("shalom")}\n\n${this.$t("flight desc")}\n${
-            this.journeyTxt
-          }\n${
-            this.data.travelers.length >= 2
-              ? `${this.$t("together with")} ${otherTravelers}`
-              : ""
-          }\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+          )}*, ${this.$t("shalom")}\n\n${this.$t("flight desc")} ${
+            this.allNamesTxt
+          }\n${this.journeyTxt}\n\n${this.$t("please pay msg")} \n\n*${this.$t(
+            "itinerary"
+          )}* ${
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
             destTxt ? `\n${destTxt}` : ""
           }${this.ticketingOptionsTxt}
 *${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
-*${this.$t("airfare")} 💲* \n${this.airfareTxt} \n
-*${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
+*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n ✅${this.$t(
+            "baggage"
+          )} 🧳 ${this.totalBaggage} \n\n❌${this.$t("seat selection")}\n${
+            this.mealTxt
+          }\n${this.$t("attention")}\n${this.$t("price may change")} \n
+*⚠️${this.$t("restrictions")}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t(
             "change"
-          )} ${this.changeFeeValue} ${this.$t("p. p")}\n${this.$t("cancel")} ${
+          )} ${this.changeFeeValue} ${this.$t("p. p.")}\n${this.$t("cancel")} ${
             this.data.prices["cancel fee"].cancelFee.value
-          }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
+          }${this.selectedCurrency} ${this.$t("p. p.")} \n${this.$t(
             "no show"
-          )} ${this.noShowValue} ${this.$t("p. p")} \n*${this.$t(
+          )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
             "ticket issuance"
-          )}: ${this.$t(
+          )}:\n      ${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}* \n\n*${this.$t("details")}* \n\n*${this.$t("baggage")}* 🧳 ${
-            this.totalBaggage
-          } \n\n*${this.$t(
-            "meal"
-          )}* 🍴 ${this.data.details.food.food.selected.map(
-            (meal) => `\n${this.$t(meal)}`
-          )} \n\n${this.$t("attention")} \n${this.$t(
-            "price may change"
-          )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
+          )}  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
+            "farewell"
+          )}`;
           break;
 
         case "Multi tickets":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
           )}*, ${this.$t("shalom")} 
-        \n\n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
+        \n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
             this.journeyTxt
-          }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+          }*\n\n${this.$t("please pay msg")}\n\n${this.$t(
+            "ticket explanation"
+          )} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
             destTxt ? `\n${destTxt}` : ""
-          }\n${this.ticketingOptionsTxt}${this.$t(
-            "please pay again msg"
-          )} \n\n${this.$t("farewell")}`;
+          }\n*${this.$t("trip total cost")}:*\n${this.$t(
+            "price calc demo"
+          )}\n\n${this.priceExplanationTxt}\n\n${
+            this.ticketingOptionsTxt
+          }${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
           break;
 
         case "Family fare":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
           )}*, ${this.$t("shalom")} 
-        \n\n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
+        \n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
             this.journeyTxt
           }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
@@ -752,25 +752,36 @@ export default {
           }\n${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t(
             "compartment options"
-          )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt} \n\n*${this.$t(
+          )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n${this.$t(
+            "attention"
+          )} \n${this.$t("price may change")} \n\n*⚠️${this.$t(
             "restrictions"
-          )}:*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
+          )}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
             this.changeFeeValue
-          } ${this.$t("p. p")} \n${this.$t("cancel")} ${
+          } ${this.$t("p. p.")} \n${this.$t("cancel")} ${
             this.data.prices["cancel fee"].cancelFee.value
-          }${this.selectedCurrency} ${this.$t("p. p")} \n${this.$t(
+          }${this.selectedCurrency} ${this.$t("p. p.")} \n${this.$t(
             "no show"
-          )} ${this.noShowValue} ${this.$t("p. p")} \n*${this.$t(
+          )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
             "ticket issuance"
-          )}: ${this.$t(
+          )}:\n       ${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}* \n\n${this.$t("attention")} \n${this.$t(
-            "price may change"
-          )} \n\n${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
+          )}*  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
+            "farewell"
+          )}`;
           break;
 
         default:
           break;
+      }
+      if (this.data.travelers.length === 1) {
+        this.whatsappMessage = this.whatsappMessage.replace(
+          "(p. p. = per person)",
+          ""
+        );
+        this.whatsappMessage = this.whatsappMessage.replace("p. p.", "");
+        this.whatsappMessage = this.whatsappMessage.replace("p. p. ", "");
+        this.whatsappMessage = this.whatsappMessage.replace(" p. p. ", "");
       }
     },
     capitalizeFirstLetter(string) {
@@ -944,15 +955,23 @@ export default {
           this.selectedCurrency
         } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
       }
-      priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
+      priceTxt += `\n*${this.$t("total")}* ${this.totalPrice}${
         this.selectedCurrency
       }`;
       return priceTxt;
     },
+    mealTxt() {
+      const selectedMeals = this.data.details.food.food.selected;
+      if (!selectedMeals.length) return "";
+      else
+        return `\n✅${this.$t("meal")} 🍴 ${selectedMeals.map(
+          (meal) => `\n${this.$t(meal)}`
+        )}\n`;
+    },
     allNamesTxt() {
       // your upcoming flight
-      let txt = `${this.$t("your")}`;
-      if (this.data.travelers.length === 1) txt += "s ";
+      let txt = `*${this.$t("your")}*`;
+      if (this.data.travelers.length === 1) txt += "*s* ";
       else {
         this.data.travelers.forEach((traveler, idx) => {
           if (idx === 0) return;
@@ -993,6 +1012,11 @@ export default {
         return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
       }
       return this.priceDetails;
+    },
+    priceExplanationTxt() {
+      return `${this.$t("trip explanation 1")} ${
+        this.data.prices["multi tickets"].numOfTicketOptions.value
+      } ${this.$t("trip explanation 2")}`;
     },
     ticketingOptionsTxt() {
       let txt = "";
