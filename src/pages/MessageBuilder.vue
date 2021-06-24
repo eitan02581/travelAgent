@@ -500,8 +500,8 @@ export default {
           //
 
           txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
-            departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
-          } ➡️ ${destAirport} ${
+            departAirport === "Tel Aviv ➡️ " ? "" : `(${departAirportCode}) ➡️ `
+          }${destAirport} ${
             destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
           } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
             `${departDay}`
@@ -689,19 +689,20 @@ export default {
         case "All":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
-          )}*, ${this.$t("shalom")} 
-    \n\n${this.$t("flight desc")} \n${this.journeyTxt}\n${
+          )}*, ${this.$t("shalom")}\n\n${this.$t("flight desc")}\n${
+            this.journeyTxt
+          }\n${
             this.data.travelers.length >= 2
               ? `${this.$t("together with")} ${otherTravelers}`
               : ""
-          } \n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+          }\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
-            this.ticketingOptionsTxt
-          }
-*${this.$t("airline")}* (xx)\n  *xxx*\n\n
-*${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
-*${this.$t("airfare")}:* \n${this.airfareTxt} \n
+          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
+            destTxt ? `\n${destTxt}` : ""
+          }${this.ticketingOptionsTxt}
+*${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
+*${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
+*${this.$t("airfare")} 💲* \n${this.airfareTxt} \n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
             "change"
           )} ${this.changeFeeValue} ${this.$t("p. p")}\n${this.$t("cancel")} ${
@@ -731,9 +732,11 @@ export default {
             this.journeyTxt
           }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} \n${OtherDestTxt} \n${destTxt} \n${
-            this.ticketingOptionsTxt
-          }${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
+          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
+            destTxt ? `\n${destTxt}` : ""
+          }\n${this.ticketingOptionsTxt}${this.$t(
+            "please pay again msg"
+          )} \n\n${this.$t("farewell")}`;
           break;
 
         case "Family fare":
@@ -744,12 +747,12 @@ export default {
             this.journeyTxt
           }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
-            this.ticketingOptionsTxt
-          }*${this.$t("airline")}* (xx)\n  *xxx*\n
-*${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n*${this.$t(
-            "airfare"
-          )}:* \n${this.airfareTxt} \n\n*${this.$t(
+          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
+            destTxt ? `\n${destTxt}` : ""
+          }\n${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
+*${this.$t("class of travel")} 💺*\n  ${this.$t(
+            "compartment options"
+          )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt} \n\n*${this.$t(
             "restrictions"
           )}:*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
             this.changeFeeValue
@@ -828,7 +831,7 @@ export default {
       str = str.toLowerCase();
       switch (str) {
         case "sun":
-          return "  ";
+          return " ";
         case "tue":
           return " ";
         case "thu":
@@ -933,19 +936,19 @@ export default {
     totalBaggage() {
       return this.data.details.baggage.baggage.selected.join(", ");
     },
-    // priceDetails() {
-    //   let priceTxt = ``,
-    //     passanger;
-    //   for (const key in this.travelersTypeAmountMap) {
-    //     priceTxt += `${this.data.prices.price[key].value}${
-    //       this.selectedCurrency
-    //     } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
-    //   }
-    //   priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
-    //     this.selectedCurrency
-    //   }`;
-    //   return priceTxt;
-    // },
+    priceDetails() {
+      let priceTxt = ``,
+        passanger;
+      for (const key in this.travelersTypeAmountMap) {
+        priceTxt += `  ${this.data.prices.price[key].value}${
+          this.selectedCurrency
+        } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
+      }
+      priceTxt += `\n${this.$t("total")} ${this.totalPrice}${
+        this.selectedCurrency
+      }`;
+      return priceTxt;
+    },
     allNamesTxt() {
       // your upcoming flight
       let txt = `${this.$t("your")}`;
@@ -975,14 +978,21 @@ export default {
       return txt;
     },
     airfareTxt() {
-      let introFamilyFareTxt = `${this.$t(FAMILY_FARE)}`,
-        optionsFamilyFareTxt = ``,
-        fareDetailsTxt = ``;
-      this.data.details.airfare[FAMILY_FARE].selected.forEach((option, idx) => {
-        optionsFamilyFareTxt += `${idx + 1}. ${this.$t(`option-${option}`)}`;
-        fareDetailsTxt += `\n${this.$t(option)}\n`;
-      });
-      return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
+      if (this.data.details.airfare.airfare.selected === "Family fare") {
+        let introFamilyFareTxt = `${this.$t(FAMILY_FARE)}`,
+          optionsFamilyFareTxt = ``,
+          fareDetailsTxt = ``;
+        this.data.details.airfare[FAMILY_FARE].selected.forEach(
+          (option, idx) => {
+            optionsFamilyFareTxt += `${idx + 1}. ${this.$t(
+              `option-${option}`
+            )}`;
+            fareDetailsTxt += `\n${this.$t(option)}\n`;
+          }
+        );
+        return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
+      }
+      return this.priceDetails;
     },
     ticketingOptionsTxt() {
       let txt = "";
