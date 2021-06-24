@@ -304,7 +304,9 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         outboundAmadeusCode:
-           "",
+          //  "",
+          `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+  3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
         // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
@@ -483,7 +485,7 @@ export default {
             destDay =
               departDateNumberOnly !== destDateNumberOnly
                 ? departDateNumberOnly < destDateNumberOnly
-                  ? DAYS[dayNumber]
+                  ? DAYS[+dayNumber === 7 ? 6 : +dayNumber]
                   : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
                   +dayNumber === 1
                   ? DAYS[6]
@@ -492,8 +494,11 @@ export default {
           } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
             // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
             destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
-          } else destDay = DAYS[dayNumber];
+          } else {
+            destDay = DAYS[+dayNumber === 7 ? 6 : +dayNumber];
+          }
           //
+
           txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
             departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
           } ➡️ ${destAirport} ${
@@ -511,6 +516,139 @@ export default {
           )} ${destDate}${this.getRightSpaceAlignment(
             destMonth
           )} ${destTime}\n   ${this.$t("seat number")} \n`;
+        });
+        return `*${way}* ${txt}`;
+      } else return "";
+    },
+    getSmartAmadeusTranslate(direction, linesString) {
+      if (linesString.length) {
+        let lines,
+          splited,
+          way,
+          airline,
+          flightNumber,
+          latterOfclassOfTravel,
+          flightClass,
+          departDate,
+          departAirportCode,
+          destAirportCode,
+          departAirport,
+          destAirport,
+          departDay,
+          destDay,
+          departTime,
+          destTime,
+          destDate,
+          dayNumber,
+          // * next line vars
+          nextLineExists;
+        nextLine;
+        splitedNextLine;
+        nextLineDepartDay,
+          nextLineDestDay,
+          nextLineDepartTime,
+          nextLineDestTime,
+          nextLineDestDate;
+        txt = "";
+
+        way =
+          direction === "ALLER"
+            ? this.$t("outbound flight")
+            : direction === "OTHER_DEST"
+            ? this.$t("other destination flight")
+            : this.$t("inbound flight");
+        lines = linesString.split("\n");
+        let charsToFirstNumber;
+        lines.forEach((line, idx) => {
+          if (idx < lines.length - 1) nextLineExists = true;
+          if (!line) return;
+
+          charsToFirstNumber = line.search(/\d/);
+          line = line.slice(charsToFirstNumber, line.length - 1);
+          // * handles 4 numbers - ly1996
+          line = line.splice(5, 0, " ");
+          // * handle * - 4*
+          line = line.splice(20, 1, " ");
+
+          splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
+          latterOfclassOfTravel = splited[3];
+          let isInClass = false;
+          for (const key in CLASSES_TYPE_MAP) {
+            isInClass = CLASSES_TYPE_MAP[key].some(
+              (latter) => latter === latterOfclassOfTravel
+            );
+            if (isInClass) {
+              flightClass = key;
+              if (this.data.classOfTravel && this.data.classOfTravel !== key) {
+                this.data.classOfTravel = "combined compartment";
+              } else this.data.classOfTravel = key;
+            }
+          }
+
+          airline = airlines.filter((item) => {
+            return item.IATA === splited[1];
+          })[0].name;
+          flightNumber = `${splited[1]}${splited[2]}`;
+          dayNumber = splited[5];
+          departAirportCode = splited[6].slice(0, 3);
+          destAirportCode = splited[6].slice(3, 6);
+          this.data.journey.push(
+            index.lookupByIataCode(departAirportCode).city
+          );
+          this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
+          departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
+          destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
+          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
+          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
+          departDate = `${splited[4]}`;
+          destDate = `${splited[10]}`;
+          departDay = DAYS[dayNumber - 1];
+
+          // * day logic
+          let departDateNumberOnly = +departDate.substr(0, 2),
+            destDateNumberOnly = +destDate.substr(0, 2),
+            departMonth = departDate.substr(2, 5),
+            destMonth = destDate.substr(2, 5),
+            departHour = departTime.substr(0, 2),
+            destHour = destTime.substr(0, 2),
+            departMinute = departTime.substr(3, 5),
+            destMinute = destTime.substr(3, 5);
+          if (departMonth === destMonth) {
+            destDay =
+              departDateNumberOnly !== destDateNumberOnly
+                ? departDateNumberOnly < destDateNumberOnly
+                  ? DAYS[dayNumber]
+                  : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+                  +dayNumber === 1
+                  ? DAYS[6]
+                  : DAYS[dayNumber - 2]
+                : departDay;
+          } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
+            // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+            destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
+          } else destDay = DAYS[dayNumber];
+          //
+          let outboundFligths = [],
+            otherDestinationFligths = [],
+            inboundFlights = [];
+          if (line)
+            txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
+              departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
+            } ➡️ ${destAirport} ${
+              destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
+            } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
+              `${departDay}`
+            )}${this.getRightSpaceAlignment(
+              departDay
+            )} ${departDate}${this.getRightSpaceAlignment(
+              departMonth
+            )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
+              `${destDay}`
+            )}${this.getRightSpaceAlignment(
+              destDay
+            )} ${destDate}${this.getRightSpaceAlignment(
+              destMonth
+            )} ${destTime}\n   ${this.$t("seat number")} \n`;
         });
         return `*${way}* ${txt}`;
       } else return "";
@@ -561,7 +699,7 @@ export default {
           } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
             this.ticketingOptionsTxt
           }
-*${this.$t("airline")}* (xx)\n*xxx*\n\n
+*${this.$t("airline")}* (xx)\n  *xxx*\n\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n
 *${this.$t("airfare")}:* \n${this.airfareTxt} \n
 *${this.$t("restrictions")}:*\n${this.$t("p. p. = per person")} \n${this.$t(
@@ -593,7 +731,7 @@ export default {
             this.journeyTxt
           }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
+          } \n${departTxt} \n${OtherDestTxt} \n${destTxt} \n${
             this.ticketingOptionsTxt
           }${this.$t("please pay again msg")} \n\n${this.$t("farewell")}`;
           break;
@@ -608,7 +746,7 @@ export default {
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} \n${OtherDestTxt} \n${destTxt}${
             this.ticketingOptionsTxt
-          }*${this.$t("airline")}* (xx)\n*xxx*\n
+          }*${this.$t("airline")}* (xx)\n  *xxx*\n
 *${this.$t("class of travel")}* \n${this.data.classOfTravel} \n\n*${this.$t(
             "airfare"
           )}:* \n${this.airfareTxt} \n\n*${this.$t(
@@ -684,7 +822,9 @@ export default {
       }
     },
     getRightSpaceAlignment(str) {
-      console.log(str);
+      // ! fix bug of undifined and remove this
+      if (!str) return str;
+      //
       str = str.toLowerCase();
       switch (str) {
         case "sun":
