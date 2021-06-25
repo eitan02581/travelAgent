@@ -272,8 +272,6 @@
 
 <script>
 import {
-  DAYS,
-  MONTHS,
   TRAVELER_TYPES,
   CLASSES_TYPE_MAP,
   LANGS,
@@ -286,9 +284,9 @@ import {
   ORDER,
 } from "src/assets/consts.js";
 
-import { airlines } from "src/assets/airlines_big.js";
-import index from "airportsjs";
+import messageMixin from "./messageMixin";
 export default {
+  mixins: [messageMixin],
   data() {
     return {
       tab: "info",
@@ -304,7 +302,7 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         outboundAmadeusCode: "",
-        //         `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+        //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
         // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
@@ -325,64 +323,6 @@ export default {
     this.init();
   },
   methods: {
-    init() {
-      if (
-        "contacts" in navigator &&
-        "select" in navigator.contacts &&
-        "getProperties" in navigator.contacts
-      ) {
-        this.contactListApiSupported = true;
-      }
-
-      if (!String.prototype.splice) {
-        /**
-         * {JSDoc}
-         *
-         * The splice() method changes the content of a string by removing a range of
-         * characters and/or adding new characters.
-         *
-         * @this {String}
-         * @param {number} start Index at which to start changing the string.
-         * @param {number} delCount An integer indicating the number of old chars to remove.
-         * @param {string} newSubStr The String that is spliced in.
-         * @return {string} A new string with the spliced substring.
-         */
-        String.prototype.splice = function (start, delCount, newSubStr) {
-          return (
-            this.slice(0, start) +
-            newSubStr +
-            this.slice(start + Math.abs(delCount))
-          );
-        };
-      }
-    },
-    async selectFromPhoneContactList() {
-      if (this.contactListApiSupported) {
-        try {
-          const availableProperties = await navigator.contacts.getProperties();
-
-          if (availableProperties.includes("address")) {
-            const contactProperties = ["name", "tel", "address"];
-
-            const contacts = await navigator.contacts.select(
-              contactProperties,
-              { multiple: false }
-            );
-
-            this.data.whatsappNumber = contacts[0].tel;
-            this.data.travelers[0].name = `${contacts[0].name}`;
-          } else {
-            console.log(
-              "Contact Picker API on your device doesn't support address property"
-            );
-          }
-        } catch {
-          console.log("Unexpected error happened in Contact Picker API");
-        }
-      } else {
-        console.log("Your browser doesn't support Contact Picker API");
-      }
-    },
     onAddTraveler() {
       this.data.travelers.push({
         name: "",
@@ -401,256 +341,6 @@ export default {
       this.data.otherDestinations = this.data.otherDestinations.filter(
         (item, idx) => idx !== idxx
       );
-    },
-    getAmadeusTranslate(direction, linesString) {
-      if (linesString.length) {
-        let lines,
-          splited,
-          way,
-          airline,
-          flightNumber,
-          latterOfclassOfTravel,
-          flightClass,
-          departDate,
-          departAirportCode,
-          destAirportCode,
-          departAirport,
-          destAirport,
-          departDay,
-          destDay,
-          departTime,
-          destTime,
-          destDate,
-          dayNumber,
-          txt = "";
-
-        way =
-          direction === "ALLER"
-            ? this.$t("outbound flight")
-            : direction === "OTHER_DEST"
-            ? this.$t("other destination flight")
-            : this.$t("inbound flight");
-        lines = linesString.split("\n");
-        let charsToFirstNumber;
-        lines.forEach((line, idx) => {
-          if (!line) return;
-          charsToFirstNumber = line.search(/\d/);
-          line = line.slice(charsToFirstNumber, line.length - 1);
-          // * handles 4 numbers - ly1996
-          line = line.splice(5, 0, " ");
-          // * handle * - 4*
-          line = line.splice(20, 1, " ");
-
-          splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-          latterOfclassOfTravel = splited[3];
-          let isInClass = false;
-          for (const key in CLASSES_TYPE_MAP) {
-            isInClass = CLASSES_TYPE_MAP[key].some(
-              (latter) => latter === latterOfclassOfTravel
-            );
-            if (isInClass) {
-              flightClass = key;
-              if (this.data.classOfTravel && this.data.classOfTravel !== key) {
-                this.data.classOfTravel = "combined compartment";
-              } else this.data.classOfTravel = key;
-            }
-          }
-
-          airline = airlines.filter((item) => {
-            return item.IATA === splited[1];
-          })[0].name;
-          flightNumber = `${splited[1]}${splited[2]}`;
-          dayNumber = splited[5];
-          departAirportCode = splited[6].slice(0, 3);
-          destAirportCode = splited[6].slice(3, 6);
-          this.data.journey.push(
-            index.lookupByIataCode(departAirportCode).city
-          );
-          this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
-          departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
-          destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
-          departDate = `${splited[4]}`;
-          destDate = `${splited[10]}`;
-          departDay = DAYS[dayNumber - 1];
-
-          // * day logic
-          let departDateNumberOnly = +departDate.substr(0, 2),
-            destDateNumberOnly = +destDate.substr(0, 2),
-            departMonth = departDate.substr(2, 5),
-            destMonth = destDate.substr(2, 5);
-          if (departMonth === destMonth) {
-            destDay =
-              departDateNumberOnly !== destDateNumberOnly
-                ? departDateNumberOnly < destDateNumberOnly
-                  ? DAYS[+dayNumber === 7 ? 6 : +dayNumber]
-                  : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-                  +dayNumber === 1
-                  ? DAYS[6]
-                  : DAYS[dayNumber - 2]
-                : departDay;
-          } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
-            // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-            destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
-          } else {
-            destDay = DAYS[+dayNumber === 7 ? 6 : +dayNumber];
-          }
-          //
-
-          txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
-            departAirport === "Tel Aviv" ? "➡️ "  : `(${departAirportCode}) ➡️ `
-          }${destAirport} ${
-            destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
-          } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
-            `${departDay}`
-          )}${this.getRightSpaceAlignment(
-            departDay
-          )} ${departDate}${this.getRightSpaceAlignment(
-            departMonth
-          )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
-            `${destDay}`
-          )}${this.getRightSpaceAlignment(
-            destDay
-          )} ${destDate}${this.getRightSpaceAlignment(
-            destMonth
-          )} ${destTime}\n   ${this.$t("seat number")} \n`;
-        });
-        return `*${way}* ${txt}`;
-      } else return "";
-    },
-    getSmartAmadeusTranslate(direction, linesString) {
-      if (linesString.length) {
-        let lines,
-          splited,
-          way,
-          airline,
-          flightNumber,
-          latterOfclassOfTravel,
-          flightClass,
-          departDate,
-          departAirportCode,
-          destAirportCode,
-          departAirport,
-          destAirport,
-          departDay,
-          destDay,
-          departTime,
-          destTime,
-          destDate,
-          dayNumber,
-          // * next line vars
-          nextLineExists;
-        nextLine;
-        splitedNextLine;
-        nextLineDepartDay,
-          nextLineDestDay,
-          nextLineDepartTime,
-          nextLineDestTime,
-          nextLineDestDate;
-        txt = "";
-
-        way =
-          direction === "ALLER"
-            ? this.$t("outbound flight")
-            : direction === "OTHER_DEST"
-            ? this.$t("other destination flight")
-            : this.$t("inbound flight");
-        lines = linesString.split("\n");
-        let charsToFirstNumber;
-        lines.forEach((line, idx) => {
-          if (idx < lines.length - 1) nextLineExists = true;
-          if (!line) return;
-
-          charsToFirstNumber = line.search(/\d/);
-          line = line.slice(charsToFirstNumber, line.length - 1);
-          // * handles 4 numbers - ly1996
-          line = line.splice(5, 0, " ");
-          // * handle * - 4*
-          line = line.splice(20, 1, " ");
-
-          splited = line.split(/(\s+)/).filter((e) => e.trim().length > 0);
-          latterOfclassOfTravel = splited[3];
-          let isInClass = false;
-          for (const key in CLASSES_TYPE_MAP) {
-            isInClass = CLASSES_TYPE_MAP[key].some(
-              (latter) => latter === latterOfclassOfTravel
-            );
-            if (isInClass) {
-              flightClass = key;
-              if (this.data.classOfTravel && this.data.classOfTravel !== key) {
-                this.data.classOfTravel = "combined compartment";
-              } else this.data.classOfTravel = key;
-            }
-          }
-
-          airline = airlines.filter((item) => {
-            return item.IATA === splited[1];
-          })[0].name;
-          flightNumber = `${splited[1]}${splited[2]}`;
-          dayNumber = splited[5];
-          departAirportCode = splited[6].slice(0, 3);
-          destAirportCode = splited[6].slice(3, 6);
-          this.data.journey.push(
-            index.lookupByIataCode(departAirportCode).city
-          );
-          this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
-          departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
-          destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-          departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-          destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
-          departDate = `${splited[4]}`;
-          destDate = `${splited[10]}`;
-          departDay = DAYS[dayNumber - 1];
-
-          // * day logic
-          let departDateNumberOnly = +departDate.substr(0, 2),
-            destDateNumberOnly = +destDate.substr(0, 2),
-            departMonth = departDate.substr(2, 5),
-            destMonth = destDate.substr(2, 5),
-            departHour = departTime.substr(0, 2),
-            destHour = destTime.substr(0, 2),
-            departMinute = departTime.substr(3, 5),
-            destMinute = destTime.substr(3, 5);
-          if (departMonth === destMonth) {
-            destDay =
-              departDateNumberOnly !== destDateNumberOnly
-                ? departDateNumberOnly < destDateNumberOnly
-                  ? DAYS[dayNumber]
-                  : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-                  +dayNumber === 1
-                  ? DAYS[6]
-                  : DAYS[dayNumber - 2]
-                : departDay;
-          } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
-            // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-            destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
-          } else destDay = DAYS[dayNumber];
-          //
-          let outboundFligths = [],
-            otherDestinationFligths = [],
-            inboundFlights = [];
-          if (line)
-            txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
-              departAirport === "Tel Aviv" ? "" : `(${departAirportCode})`
-            } ➡️ ${destAirport} ${
-              destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
-            } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
-              `${departDay}`
-            )}${this.getRightSpaceAlignment(
-              departDay
-            )} ${departDate}${this.getRightSpaceAlignment(
-              departMonth
-            )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
-              `${destDay}`
-            )}${this.getRightSpaceAlignment(
-              destDay
-            )} ${destDate}${this.getRightSpaceAlignment(
-              destMonth
-            )} ${destTime}\n   ${this.$t("seat number")} \n`;
-        });
-        return `*${way}* ${txt}`;
-      } else return "";
     },
     onPreview() {
       let departTxt,
@@ -689,11 +379,9 @@ export default {
         case "All":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
-          )}*, ${this.$t("shalom")}\n\n${this.$t("flight desc")} ${
-            this.allNamesTxt
-          }\n${this.journeyTxt}\n\n${this.$t("please pay msg")} \n\n*${this.$t(
-            "itinerary"
-          )}* ${
+          )}*, ${this.$t("shalom")}\n\n${this.getRelevantTxtStructure(
+            "opening"
+          )}\n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
             destTxt ? `\n${destTxt}` : ""
@@ -724,9 +412,7 @@ export default {
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
           )}*, ${this.$t("shalom")} 
-        \n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
-            this.journeyTxt
-          }*\n\n${this.$t("please pay msg")}\n\n${this.$t(
+        \n${this.getRelevantTxtStructure("opening")}\n\n${this.$t(
             "ticket explanation"
           )} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
@@ -743,9 +429,9 @@ export default {
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
           )}*, ${this.$t("shalom")} 
-        \n${this.$t("flight desc")} ${this.allNamesTxt} \n*${
-            this.journeyTxt
-          }*\n\n${this.$t("please pay msg")} \n\n*${this.$t("itinerary")}* ${
+        \n${this.getRelevantTxtStructure("opening")}\n\n*${this.$t(
+            "itinerary"
+          )}* ${
             this.data.details.itinerary.itinerary.selected
           } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
             destTxt ? `\n${destTxt}` : ""
@@ -782,14 +468,38 @@ export default {
         this.whatsappMessage = this.whatsappMessage.replaceAll("p. p.", "");
       }
     },
-    capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    },
-    onRedirectToWhatsapp() {
-      const url = `https://api.whatsapp.com/send?phone=${
-        this.data.whatsappNumber
-      }&text=%20${encodeURIComponent(this.whatsappMessage)}`;
-      window.open(url, "_blank");
+    getRelevantTxtStructure(part) {
+      if (this.selectedLang === "en") {
+        switch (part) {
+          case "opening":
+            return `${this.$t("flight desc")} ${this.allNamesTxt}\n*${
+              this.journeyTxt
+            }*\n\n${this.$t("please pay msg")} `;
+
+          default:
+            return "___ need to complete ___";
+        }
+      } else if (this.selectedLang === "fr") {
+        switch (part) {
+          case "opening":
+            return `${this.$t("flight desc")} *${this.journeyTxt}*${
+              this.allNamesTxt ? `\n${this.allNamesTxt}` : ""
+            }\n\n${this.$t("please pay msg")} `;
+
+          default:
+            return "___ need to complete ___";
+        }
+      } else if (this.selectedLang === "he") {
+        switch (part) {
+          case "opening":
+            return `${this.$t("flight desc")} ${this.allNamesTxt}\n${
+              this.journeyTxt
+            }\n\n${this.$t("please pay msg")} `;
+
+          default:
+            return "___ need to complete ___";
+        }
+      }
     },
     getAmountOfSpecificTraveler(travelerType) {
       return this.data.travelers.filter((tr) => tr.type === travelerType)
@@ -831,52 +541,6 @@ export default {
 
         default:
           return true;
-      }
-    },
-    getRightSpaceAlignment(str) {
-      // ! fix bug of undifined and remove this
-      if (!str) return str;
-      //
-      str = str.toLowerCase();
-      switch (str) {
-        case "sun":
-          return " ";
-        case "tue":
-          return " ";
-        case "thu":
-          return " ";
-        case "fri":
-          return "   ";
-        case "sat":
-          return "  ";
-        // * months
-        case "jan":
-          return "";
-        case "feb":
-          return " ";
-        case "mar":
-          return "";
-        case "apr":
-          return " ";
-        case "may":
-          return "";
-        case "jun":
-          return " ";
-        case "jul":
-          return " ";
-        case "aug":
-          return "";
-        case "sep":
-          return " ";
-        case "oct":
-          return "";
-        case "nov":
-          return " ";
-        case "dec":
-          return "";
-
-        default:
-          return "";
       }
     },
   },
@@ -968,18 +632,35 @@ export default {
     },
     allNamesTxt() {
       // your upcoming flight
-      let txt = `${this.$t("your")}`;
-      if (this.data.travelers.length === 1) txt += "s ";
-      else {
+      console.log(this.$i18n.locale);
+      let txt = "";
+      if (this.$i18n.locale === "en") {
+        txt = `${this.$t("your")}`;
+        if (this.data.travelers.length === 1) txt += "s ";
+        else {
+          this.data.travelers.forEach((traveler, idx) => {
+            if (idx === 0) return;
+            // * first traveler is the the "your" above
+            txt += " & " + this.capitalizeFirstLetter(traveler.name);
+          });
+          txt = `*${txt}\'s* `;
+        }
+        return txt + this.$t("upcoming trip to");
+      } else if (this.$i18n.locale === "fr") {
         this.data.travelers.forEach((traveler, idx) => {
           if (idx === 0) return;
-          // * first traveler is the the "your" above
-          txt += " & " + this.capitalizeFirstLetter(traveler.name);
+          if (idx === 1) {
+            txt += `accompagné de *${this.capitalizeFirstLetter(
+              traveler.name
+            )}*`;
+          } else {
+            // * & will added form the second and so
+            txt += " *& " + this.capitalizeFirstLetter(traveler.name) + "*";
+          }
         });
-        txt = `*${txt}\'s* `;
+        console.log(txt);
+        return txt;
       }
-
-      return txt + this.$t("upcoming trip to");
     },
     journeyTxt() {
       let txt = "";
@@ -1027,8 +708,11 @@ export default {
     },
   },
   watch: {
-    selectedLang(lang) {
-      this.$i18n.locale = lang;
+    selectedLang: {
+      handler(lang) {
+        this.$i18n.locale = lang;
+      },
+      immediate: true,
     },
     "data.travelers": {
       handler(travelers) {

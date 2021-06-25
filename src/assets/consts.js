@@ -184,6 +184,14 @@ export const FORM_ITEMS = {
             templatesToBeDisplayIn: ["all"],
             baggage: {
                 options: [
+                    // { label: "No Checked bag", value: `\n${this.$t('No Checked bag')}` },
+                    // { label: "Carry-on Baggage", value: `\n${this.$t('Carry-on Baggage')}` },
+                    // { label: "1 Checked bag 23 kg", value: `\n${this.$t('1 Checked bag 23 kg')}` },
+                    // { label: "2 Checked bag 23 kg", value: `\n${this.$t('2 Checked bag 23 kg')}` },
+                    // { label: "3 Checked bag 23 kg", value: `\n${this.$t('3 Checked bag 23 kg')}` },
+                    // { label: "1 Checked bag 20 kg", value: `\n${this.$t('1 Checked bag 20 kg')}` },
+                    // { label: "2 Checked bag 20 kg", value: `\n${this.$t('2 Checked bag 20 kg')}` },
+                    // { label: "3 Checked bag 20 kg", value: `\n${this.$t('3 Checked bag 20 kg')}` },
                     { label: "No Checked bag", value: "\nNo Checked bag" },
                     { label: "Carry-on Baggage", value: "\nCarry-on Baggage" },
                     { label: "1 Checked bag 23 kg", value: "\n1 Checked bag 23 kg" },
