@@ -499,7 +499,7 @@ export default {
           //
 
           txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${
-            departAirport === "Tel Aviv ➡️ " ? "" : `(${departAirportCode}) ➡️ `
+            departAirport === "Tel Aviv" ? "➡️ "  : `(${departAirportCode}) ➡️ `
           }${destAirport} ${
             destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
           } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
@@ -713,9 +713,9 @@ export default {
             "no show"
           )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
             "ticket issuance"
-          )}:\n      ${this.$t(
+          )}:*\n      *${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
+          )}*  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
             "farewell"
           )}`;
           break;
@@ -764,7 +764,7 @@ export default {
             "no show"
           )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
             "ticket issuance"
-          )}:\n       ${this.$t(
+          )}:*\n      *${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
           )}*  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
             "farewell"
@@ -775,13 +775,11 @@ export default {
           break;
       }
       if (this.data.travelers.length === 1) {
-        this.whatsappMessage = this.whatsappMessage.replace(
+        this.whatsappMessage = this.whatsappMessage.replaceAll(
           "(p. p. = per person)",
           ""
         );
-        this.whatsappMessage = this.whatsappMessage.replace("p. p.", "");
-        this.whatsappMessage = this.whatsappMessage.replace("p. p. ", "");
-        this.whatsappMessage = this.whatsappMessage.replace(" p. p. ", "");
+        this.whatsappMessage = this.whatsappMessage.replaceAll("p. p.", "");
       }
     },
     capitalizeFirstLetter(string) {
@@ -970,8 +968,8 @@ export default {
     },
     allNamesTxt() {
       // your upcoming flight
-      let txt = `*${this.$t("your")}*`;
-      if (this.data.travelers.length === 1) txt += "*s* ";
+      let txt = `${this.$t("your")}`;
+      if (this.data.travelers.length === 1) txt += "s ";
       else {
         this.data.travelers.forEach((traveler, idx) => {
           if (idx === 0) return;
