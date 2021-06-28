@@ -6,6 +6,8 @@ import {
 import { airlines } from "src/assets/airlines_big.js";
 import index from "airportsjs";
 
+// destructuring to keep only what is needed
+
 const messageMixin = {
     methods: {
         init() {
@@ -74,16 +76,18 @@ const messageMixin = {
                 }&text=%20${encodeURIComponent(this.whatsappMessage)}`;
             window.open(url, "_blank");
         },
-        getAmadeusTranslate(direction, linesString) {
+        getAmadeusTranslate(linesString) {
             if (linesString.length) {
                 let lines,
                     splited,
+                    nextLineSplited,
                     way,
                     airline,
                     flightNumber,
                     latterOfclassOfTravel,
                     flightClass,
                     departDate,
+                    nextLineDepartDate,
                     departAirportCode,
                     destAirportCode,
                     departAirport,
@@ -91,27 +95,31 @@ const messageMixin = {
                     departDay,
                     destDay,
                     departTime,
+                    nextLineDepartTime,
                     destTime,
                     destDate,
                     dayNumber,
                     txt = "";
 
-                way =
-                    direction === "ALLER"
-                        ? this.$t("outbound flight")
-                        : direction === "OTHER_DEST"
-                            ? this.$t("other destination flight")
-                            : this.$t("inbound flight");
+                // way =
+                //     direction === "ALLER"
+                //         ? this.$t("outbound flight")
+                //         : direction === "OTHER_DEST"
+                //             ? this.$t("other destination flight")
+                //             : this.$t("inbound flight");
+
                 lines = linesString.split("\n");
                 lines.forEach((line, idx) => {
                     splited = this.getSplittedLine(line)
+                    nextLineSplited = this.getSplittedLine(lines[idx + 1])
+
                     latterOfclassOfTravel = splited[3];
                     flightClass = this.setClassOfTravel(latterOfclassOfTravel)
 
                     airline = airlines.filter((item) => {
                         return item.IATA === splited[1];
                     })[0].name;
-                    
+
                     flightNumber = `${splited[1]}${splited[2]}`;
                     dayNumber = splited[5];
                     departAirportCode = splited[6].slice(0, 3);
@@ -127,12 +135,32 @@ const messageMixin = {
                     departDate = `${splited[4]}`;
                     destDate = `${splited[10]}`;
                     departDay = DAYS[dayNumber - 1];
+                    if (nextLineSplited) {
+                        console.log(nextLineSplited);
+                        nextLineDepartDate = `${nextLineSplited[4]}`;
+                        nextLineDepartTime = `${nextLineSplited[8].slice(0, 2)}:${nextLineSplited[8].slice(2, 4)}`;
+                    }
 
                     // * day logic
-                    let departDateNumberOnly = +departDate.substr(0, 2),
+                    let
+                        departDateNumberOnly = +departDate.substr(0, 2),
                         destDateNumberOnly = +destDate.substr(0, 2),
                         departMonth = departDate.substr(2, 5),
-                        destMonth = destDate.substr(2, 5);
+                        destMonth = destDate.substr(2, 5),
+                        destHour = destTime.substr(0, 2),
+                        destMinutes = destTime.substr(3, 5),
+                        nextLineDepartDateNumberOnly,
+                        nextLineDepartMonth,
+                        nextLineDepartHour,
+                        nextLineDepartMinutes
+
+                    if (nextLineSplited) {
+                        nextLineDepartDateNumberOnly = +nextLineDepartDate.substr(0, 2),
+                            nextLineDepartMonth = nextLineDepartDate.substr(2, 5),
+                            nextLineDepartHour = nextLineDepartTime.substr(0, 2),
+                            nextLineDepartMinutes = nextLineDepartTime.substr(3, 5);
+                    }
+
                     if (departMonth === destMonth) {
                         destDay =
                             departDateNumberOnly !== destDateNumberOnly
@@ -151,6 +179,33 @@ const messageMixin = {
                     }
                     //
 
+                    let currYear = new Date().getFullYear(), destFormattedDate = new Date(), nextLineDepartFormattedDate = new Date()
+                    destFormattedDate.setFullYear(currYear)
+                    destFormattedDate.setMonth(MONTHS.indexOf(destMonth))
+                    destFormattedDate.setDate(destDateNumberOnly)
+                    destFormattedDate.setHours(destHour)
+                    destFormattedDate.setMinutes(destMinutes)
+                    if (nextLineSplited) {
+                        nextLineDepartFormattedDate.setFullYear(currYear)
+                        nextLineDepartFormattedDate.setMonth(MONTHS.indexOf(nextLineDepartMonth))
+                        nextLineDepartFormattedDate.setDate(nextLineDepartDateNumberOnly)
+                        nextLineDepartFormattedDate.setHours(nextLineDepartHour)
+                        nextLineDepartFormattedDate.setMinutes(nextLineDepartMinutes)
+                    }
+
+
+
+
+
+
+                    const difference = nextLineDepartFormattedDate.getTime() - destFormattedDate.getTime();
+                    const hoursDifference = Math.floor(difference / 1000 / 60 / 60);
+
+                    if (idx === 0) {
+                        way = this.$t("outbound flight")
+                        txt += `*${way}*`
+                    }
+
                     txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${departAirport === "Tel Aviv" ? "➡️ " : `(${departAirportCode}) ➡️ `
                         }${destAirport} ${destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
                         } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
@@ -166,8 +221,14 @@ const messageMixin = {
                         )} ${destDate}${this.getRightSpaceAlignment(
                             destMonth
                         )} ${destTime}\n   ${this.$t("seat number")} \n`;
+
+                    if (24 < hoursDifference && !way.includes(this.$t("inbound flight"))) {
+                        way = this.$t("inbound flight")
+                        txt += `\n*${way}*`
+                    }
+                    655
                 });
-                return `*${way}* ${txt}`;
+                return txt;
             } else return "";
         },
         getSplittedLine(line) {

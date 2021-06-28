@@ -302,9 +302,9 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         outboundAmadeusCode:
-          // "",
-          `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-        3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
+          "",
+        //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+        // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
         // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
@@ -344,7 +344,7 @@ export default {
       );
     },
     onPreview() {
-      let departTxt,
+      let flightsTxt,
         OtherDestTxt = "",
         destTxt,
         otherTravelers;
@@ -352,22 +352,19 @@ export default {
       this.data.journey = [];
       this.data.classOfTravel = "";
 
-      departTxt = this.getAmadeusTranslate(
-        "ALLER",
-        this.data.outboundAmadeusCode
-      );
+      flightsTxt = this.getAmadeusTranslate(this.data.outboundAmadeusCode);
 
-      this.data.otherDestinations.forEach((input, idx) => {
-        if (!input) return;
+      // this.data.otherDestinations.forEach((input, idx) => {
+      //   if (!input) return;
 
-        OtherDestTxt +=
-          this.getAmadeusTranslate("OTHER_DEST", input) +
-          (idx < this.data.otherDestinations.length - 1 ? "\n" : "");
-      });
-      destTxt = this.getAmadeusTranslate(
-        "RETOUR",
-        this.data.inboundAmadeusCode
-      );
+      //   OtherDestTxt +=
+      //     this.getAmadeusTranslate("OTHER_DEST", input) +
+      //     (idx < this.data.otherDestinations.length - 1 ? "\n" : "");
+      // });
+      // destTxt = this.getAmadeusTranslate(
+      //   "RETOUR",
+      //   this.data.inboundAmadeusCode
+      // );
 
       otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
@@ -384,9 +381,7 @@ export default {
             "opening"
           )}\n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
-            destTxt ? `\n${destTxt}` : ""
-          }${this.ticketingOptionsTxt}
+          } \n${flightsTxt} ${this.ticketingOptionsTxt}
 *${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
 *${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n ✅${this.$t(
@@ -417,9 +412,7 @@ export default {
             "ticket explanation"
           )} \n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
-            destTxt ? `\n${destTxt}` : ""
-          }\n*${this.$t("trip total cost")}:*\n${this.$t(
+          } \n${flightsTxt}\n*${this.$t("trip total cost")}:*\n${this.$t(
             "price calc demo"
           )}\n\n${this.priceExplanationTxt}\n\n${
             this.ticketingOptionsTxt
@@ -434,9 +427,7 @@ export default {
             "itinerary"
           )}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${departTxt} ${OtherDestTxt ? `\n${OtherDestTxt}` : ""} ${
-            destTxt ? `\n${destTxt}` : ""
-          }\n${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
+          } \n${flightsTxt} \n${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t(
             "compartment options"
           )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n${this.$t(
