@@ -78,158 +78,112 @@ const messageMixin = {
         },
         getAmadeusTranslate(linesString) {
             if (linesString.length) {
-                let lines,
-                    splited,
-                    nextLineSplited,
-                    way,
-                    airline,
-                    flightNumber,
-                    latterOfclassOfTravel,
-                    flightClass,
-                    departDate,
-                    nextLineDepartDate,
-                    departAirportCode,
-                    destAirportCode,
-                    departAirport,
-                    destAirport,
-                    departDay,
-                    destDay,
-                    departTime,
-                    nextLineDepartTime,
-                    destTime,
-                    destDate,
-                    dayNumber,
-                    txt = "";
+                let lines, splited, nextLineSplited, hoursDifference = 0, way, txt = "";
 
-                // way =
-                //     direction === "ALLER"
-                //         ? this.$t("outbound flight")
-                //         : direction === "OTHER_DEST"
                 //             ? this.$t("other destination flight")
-                //             : this.$t("inbound flight");
 
                 lines = linesString.split("\n");
+                let nextLine;
+
                 lines.forEach((line, idx) => {
                     splited = this.getSplittedLine(line)
                     nextLineSplited = this.getSplittedLine(lines[idx + 1])
 
-                    latterOfclassOfTravel = splited[3];
-                    flightClass = this.setClassOfTravel(latterOfclassOfTravel)
+                    line = this.getSplitedLineDetails(splited)
+                    if (nextLineSplited)
+                        nextLine = this.getSplitedLineDetails(nextLineSplited)
 
-                    airline = airlines.filter((item) => {
-                        return item.IATA === splited[1];
-                    })[0].name;
+                    if (nextLine) {
+                        hoursDifference = this.getHourDifference(line, nextLine)
+                        if (idx === 0) {
+                            way = this.$t("outbound flight")
+                            txt += `*${way}*`
+                        }
 
-                    flightNumber = `${splited[1]}${splited[2]}`;
-                    dayNumber = splited[5];
-                    departAirportCode = splited[6].slice(0, 3);
-                    destAirportCode = splited[6].slice(3, 6);
-                    this.data.journey.push(
-                        index.lookupByIataCode(departAirportCode).city
-                    );
-                    this.data.journey.push(index.lookupByIataCode(destAirportCode).city);
-                    departAirport = `${index.lookupByIataCode(departAirportCode).city}`;
-                    destAirport = `${index.lookupByIataCode(destAirportCode).city}`;
-                    departTime = `${splited[8].slice(0, 2)}:${splited[8].slice(2, 4)}`;
-                    destTime = `${splited[9].slice(0, 2)}:${splited[9].slice(2, 4)}`;
-                    departDate = `${splited[4]}`;
-                    destDate = `${splited[10]}`;
-                    departDay = DAYS[dayNumber - 1];
-                    if (nextLineSplited) {
-                        console.log(nextLineSplited);
-                        nextLineDepartDate = `${nextLineSplited[4]}`;
-                        nextLineDepartTime = `${nextLineSplited[8].slice(0, 2)}:${nextLineSplited[8].slice(2, 4)}`;
                     }
 
-                    // * day logic
-                    let
-                        departDateNumberOnly = +departDate.substr(0, 2),
-                        destDateNumberOnly = +destDate.substr(0, 2),
-                        departMonth = departDate.substr(2, 5),
-                        destMonth = destDate.substr(2, 5),
-                        destHour = destTime.substr(0, 2),
-                        destMinutes = destTime.substr(3, 5),
-                        nextLineDepartDateNumberOnly,
-                        nextLineDepartMonth,
-                        nextLineDepartHour,
-                        nextLineDepartMinutes
-
-                    if (nextLineSplited) {
-                        nextLineDepartDateNumberOnly = +nextLineDepartDate.substr(0, 2),
-                            nextLineDepartMonth = nextLineDepartDate.substr(2, 5),
-                            nextLineDepartHour = nextLineDepartTime.substr(0, 2),
-                            nextLineDepartMinutes = nextLineDepartTime.substr(3, 5);
-                    }
-
-                    if (departMonth === destMonth) {
-                        destDay =
-                            departDateNumberOnly !== destDateNumberOnly
-                                ? departDateNumberOnly < destDateNumberOnly
-                                    ? DAYS[+dayNumber === 7 ? 0 : +dayNumber]
-                                    : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-                                    +dayNumber === 1
-                                        ? DAYS[6]
-                                        : DAYS[dayNumber - 2]
-                                : departDay;
-                    } else if (MONTHS.indexOf(departMonth) > MONTHS.indexOf(destMonth)) {
-                        // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
-                        destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
-                    } else {
-                        destDay = DAYS[+dayNumber === 7 ? 6 : +dayNumber];
-                    }
-                    //
-
-                    let currYear = new Date().getFullYear(), destFormattedDate = new Date(), nextLineDepartFormattedDate = new Date()
-                    destFormattedDate.setFullYear(currYear)
-                    destFormattedDate.setMonth(MONTHS.indexOf(destMonth))
-                    destFormattedDate.setDate(destDateNumberOnly)
-                    destFormattedDate.setHours(destHour)
-                    destFormattedDate.setMinutes(destMinutes)
-                    if (nextLineSplited) {
-                        nextLineDepartFormattedDate.setFullYear(currYear)
-                        nextLineDepartFormattedDate.setMonth(MONTHS.indexOf(nextLineDepartMonth))
-                        nextLineDepartFormattedDate.setDate(nextLineDepartDateNumberOnly)
-                        nextLineDepartFormattedDate.setHours(nextLineDepartHour)
-                        nextLineDepartFormattedDate.setMinutes(nextLineDepartMinutes)
-                    }
-
-
-
-
-
-
-                    const difference = nextLineDepartFormattedDate.getTime() - destFormattedDate.getTime();
-                    const hoursDifference = Math.floor(difference / 1000 / 60 / 60);
-
-                    if (idx === 0) {
-                        way = this.$t("outbound flight")
-                        txt += `*${way}*`
-                    }
-
-                    txt += `\n${airline} - *${flightNumber}* \n${departAirport} ${departAirport === "Tel Aviv" ? "➡️ " : `(${departAirportCode}) ➡️ `
-                        }${destAirport} ${destAirport === "Tel Aviv" ? "" : `(${destAirportCode})`
-                        } \n${this.$t(`${flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
-                            `${departDay}`
+                    txt += `\n${line.airline} - *${line.flightNumber}* \n${line.departAirport} ${line.departAirport === "Tel Aviv" ? "➡️ " : `(${line.departAirportCode}) ➡️ `
+                        }${line.destAirport} ${line.destAirport === "Tel Aviv" ? "" : `(${line.destAirportCode})`
+                        } \n${this.$t(`${line.flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
+                            `${line.departDay}`
                         )}${this.getRightSpaceAlignment(
-                            departDay
-                        )} ${departDate}${this.getRightSpaceAlignment(
-                            departMonth
-                        )} ${departTime}  \n ${this.$t("arr.")}  ${this.$t(
-                            `${destDay}`
+                            line.departDay
+                        )} ${line.departDate}${this.getRightSpaceAlignment(
+                            line.departMonth
+                        )} ${line.departTime}  \n ${this.$t("arr.")}  ${this.$t(
+                            `${line.destDay}`
                         )}${this.getRightSpaceAlignment(
-                            destDay
-                        )} ${destDate}${this.getRightSpaceAlignment(
-                            destMonth
-                        )} ${destTime}\n   ${this.$t("seat number")} \n`;
+                            line.destDay
+                        )} ${line.destDate}${this.getRightSpaceAlignment(
+                            line.destMonth
+                        )} ${line.destTime}\n   ${this.$t("seat number")} \n`;
 
-                    if (24 < hoursDifference && !way.includes(this.$t("inbound flight"))) {
+                    if (24 < hoursDifference) {
+                        if (way.includes(this.$t("inbound flight"))) {
+                            txt = txt.replace(`${this.$t("inbound flight")}`, `${this.$t("other destination flight")}`);
+                        }
                         way = this.$t("inbound flight")
                         txt += `\n*${way}*`
                     }
-                    655
                 });
                 return txt;
             } else return "";
+        },
+        getSplitedLineDetails(splitedLine) {
+            if (!splitedLine) return
+            let line = {}, latterOfclassOfTravel, dayNumber;
+
+            latterOfclassOfTravel = splitedLine[3];
+            line.flightClass = this.setClassOfTravel(latterOfclassOfTravel)
+            line.airline = airlines.filter((item) => {
+                return item.IATA === splitedLine[1];
+            })[0].name;
+            line.flightNumber = `${splitedLine[1]}${splitedLine[2]}`;
+            dayNumber = splitedLine[5];
+            line.departAirportCode = splitedLine[6].slice(0, 3);
+            line.destAirportCode = splitedLine[6].slice(3, 6);
+            this.data.journey.push(
+                index.lookupByIataCode(line.departAirportCode).city
+            );
+            this.data.journey.push(index.lookupByIataCode(line.destAirportCode).city);
+            line.departAirport = `${index.lookupByIataCode(line.departAirportCode).city}`;
+            line.destAirport = `${index.lookupByIataCode(line.destAirportCode).city}`;
+            line.departTime = `${splitedLine[8].slice(0, 2)}:${splitedLine[8].slice(2, 4)}`;
+            line.destTime = `${splitedLine[9].slice(0, 2)}:${splitedLine[9].slice(2, 4)}`;
+            line.departDate = `${splitedLine[4]}`;
+            line.destDate = `${splitedLine[10]}`;
+            line.departDay = DAYS[dayNumber - 1];
+
+            // * day logic
+            line.departDateNumberOnly = +line.departDate.substr(0, 2);
+            line.destDateNumberOnly = +line.destDate.substr(0, 2);
+            line.destMonth = line.destDate.substr(2, 5);
+            line.departMonth = line.departDate.substr(2, 5);
+            line.destHour = line.destTime.substr(0, 2);
+            line.destMinutes = line.destTime.substr(3, 5);
+            line.departHour = line.departTime.substr(0, 2);
+            line.departMinutes = line.departTime.substr(3, 5);
+
+            if (line.departMonth === line.destMonth) {
+                line.destDay =
+                    line.departDateNumberOnly !== line.destDateNumberOnly
+                        ? line.departDateNumberOnly < line.destDateNumberOnly
+                            ? DAYS[+dayNumber === 7 ? 0 : +dayNumber]
+                            : // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+                            +dayNumber === 1
+                                ? DAYS[6]
+                                : DAYS[dayNumber - 2]
+                        : line.departDay;
+            } else if (MONTHS.indexOf(line.departMonth) > MONTHS.indexOf(line.destMonth)) {
+                // * in case dayNumber is mon (1) in js [0] and the previos day is sun (7) in js [6]
+                line.destDay = +dayNumber === 1 ? DAYS[6] : DAYS[dayNumber - 2];
+            } else {
+                line.destDay = DAYS[+dayNumber === 7 ? 6 : +dayNumber];
+            }
+            // 
+
+            return line
+
         },
         getSplittedLine(line) {
             if (!line) return;
@@ -258,9 +212,27 @@ const messageMixin = {
             }
             return flightClass
         },
+        getHourDifference(line, nextLine) {
+            let currYear = new Date().getFullYear(), destFormattedDate = new Date(), nextLineDepartFormattedDate = new Date()
+
+            destFormattedDate.setFullYear(currYear)
+            destFormattedDate.setMonth(MONTHS.indexOf(line.destMonth))
+            destFormattedDate.setDate(line.destDateNumberOnly)
+            destFormattedDate.setHours(line.destHour)
+            destFormattedDate.setMinutes(line.destMinutes)
+            nextLineDepartFormattedDate.setFullYear(currYear)
+            nextLineDepartFormattedDate.setMonth(MONTHS.indexOf(nextLine.departMonth))
+            nextLineDepartFormattedDate.setDate(nextLine.departDateNumberOnly)
+            nextLineDepartFormattedDate.setHours(nextLine.departHour)
+            nextLineDepartFormattedDate.setMinutes(nextLine.departMinutes)
+
+            const difference = nextLineDepartFormattedDate.getTime() - destFormattedDate.getTime();
+            const hoursDifference = Math.floor(difference / 1000 / 60 / 60);
+
+            return hoursDifference
+        },
         getRightSpaceAlignment(str) {
             str = this.$t(str).toLowerCase();
-            console.log(str);
             switch (str) {
                 // * en
                 case "sun":
