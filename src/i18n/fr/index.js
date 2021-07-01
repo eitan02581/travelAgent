@@ -105,7 +105,7 @@ export default {
   "Within 24h": "Within 24h",
   "Within 48h": "Within 48h",
   "Within 72h": "Within 72h",
-  "compartment options": `Combined Compartments\n  Outbound - **\n  Inbound - **\n  Long-haul portion - **\n  Short-haul portion - **`,
+"compartment options": `Economy, Premium Cl., Business \n  Combined Compartments\n  Outbound - **\n  Inbound - **\n  Long-haul portion - **\n  Short-haul portion - **`,
   "seat selection": "Présélection de siège 💺 \nMoyennant supplement",
   "ticket explanation": "You should notice that your itinerary will require the combination of two separated airfare/tickets each with its own restrictions.",
   "trip total cost": "TRIP TOTAL COST",
@@ -120,6 +120,8 @@ export default {
   "1 Checked bag 20 kg": "1 Checked bag 20 kg",
   "2 Checked bag 20 kg": "2 Checked bag 20 kg",
   "3 Checked bag 20 kg": "3 Checked bag 20 kg",
+  // * destinations 
+  // 
   "": "",
   "": "",
   "": "",

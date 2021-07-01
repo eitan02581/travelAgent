@@ -90,6 +90,11 @@ const messageMixin = {
                     nextLineSplited = this.getSplittedLine(lines[idx + 1])
 
                     line = this.getSplitedLineDetails(splited)
+
+                    if (idx === 0) {
+                        this.firstDepart = line.departAirport
+                    }
+
                     if (nextLineSplited)
                         nextLine = this.getSplitedLineDetails(nextLineSplited)
 
@@ -102,19 +107,19 @@ const messageMixin = {
 
                     }
 
-                    txt += `\n${line.airline} - *${line.flightNumber}* \n${this.$t(line.departAirport)} ${line.departAirport === "Tel Aviv" ? "➡️ " : `(${line.departAirportCode}) ➡️ `
+                    txt += `\n${line.airline} - *${line.flightNumber}* \n${this.$t(line.departAirport)} ${line.departAirport === "Tel Aviv" ? `${this.directionEmoji} ` : `(${line.departAirportCode}) ${this.directionEmoji} `
                         }${this.$t(line.destAirport)} ${line.destAirport === "Tel Aviv" ? "" : `(${line.destAirportCode})`
-                        } \n${this.$t(`${line.flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
+                        } \n${this.$t(`${this.$t(line.flightClass)}`)} \n ${this.$t("dpt.")} ${this.$t(
                             `${line.departDay}`
                         )}${this.getRightSpaceAlignment(
                             line.departDay
-                        )} ${line.departDate}${this.getRightSpaceAlignment(
+                        )} ${line.departDateNumberOnlyStr} ${this.$t(line.departMonth)}${this.getRightSpaceAlignment(
                             line.departMonth
                         )} ${line.departTime}  \n ${this.$t("arr.")}  ${this.$t(
                             `${line.destDay}`
                         )}${this.getRightSpaceAlignment(
                             line.destDay
-                        )} ${line.destDate}${this.getRightSpaceAlignment(
+                        )} ${line.destDateNumberStr} ${this.$t(line.destMonth)}${this.getRightSpaceAlignment(
                             line.destMonth
                         )} ${line.destTime}\n   ${this.$t("seat number")} \n`;
 
@@ -155,7 +160,9 @@ const messageMixin = {
             line.departDay = DAYS[dayNumber - 1];
 
             // * day logic
+            line.departDateNumberOnlyStr = line.departDate.substr(0, 2);
             line.departDateNumberOnly = +line.departDate.substr(0, 2);
+            line.destDateNumberStr = line.destDate.substr(0, 2);
             line.destDateNumberOnly = +line.destDate.substr(0, 2);
             line.destMonth = line.destDate.substr(2, 5);
             line.departMonth = line.departDate.substr(2, 5);
@@ -258,21 +265,46 @@ const messageMixin = {
                     return " ";
                 case "sam":
                     return "";
-                // * fr
+                // * he
                 case "יום א":
-                    return "  ";
+                    return "";
                 case "יום ב":
-                    return "  ";
+                    return "";
                 case "יום ג":
-                    return "  ";
+                    return "";
                 case "יום ד":
-                    return "  ";
+                    return "";
                 case "יום ה":
-                    return " ";
+                    return "";
                 case "יום ו":
-                    return "  ";
+                    return " ";
                 case "יום ש":
                     return "";
+                case "ינו'":
+                    return "   ";
+                case "פבר'":
+                    return "";
+                case "מרץ":
+                    return " ";
+                case "אפר'":
+                    return "";
+                case "מאי":
+                    return " ";
+                case "יוני":
+                    return "  ";
+                case "יולי":
+                    return "  ";
+                case "אוג'":
+                    return "";
+                case "ספט'":
+                    return "";
+                case "אוק'":
+                    return " ";
+                case "נוב'":
+                    return "  ";
+                case "דצמ'":
+                    return "";
+
                 // * months
                 case "jan":
                     return "";
@@ -303,6 +335,11 @@ const messageMixin = {
                     return "";
             }
         },
+    },
+    computed: {
+        directionEmoji() {
+            return this.$i18n.locale === "he" ? '⬅️' : '➡️'
+        }
     }
 }
 export default messageMixin;

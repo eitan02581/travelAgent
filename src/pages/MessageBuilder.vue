@@ -254,22 +254,23 @@ export default {
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
       LANGS: LANGS,
-      selectedLang: "he",
+      selectedLang: "en",
       formStructure: FORM_STRUCTURE,
       selectedBagges: [],
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         smartAmadeusCode:
-          // "",
+          "",
           //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
           // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
-          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-        4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-        5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-        6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+        //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         journey: [],
         classOfTravel: "",
+        firstDepart: null,
         ...FORM_ITEMS,
       },
       previewTxt: "",
@@ -317,11 +318,11 @@ export default {
           } \n${flightsTxt} ${this.ticketingOptionsTxt}
 *${this.$t("airline")}* (XX) ✈️\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
-*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n ✅${this.$t(
-            "baggage"
-          )} 🧳 ${this.totalBaggage} \n\n❌${this.$t("seat selection")}\n${
-            this.mealTxt
-          }\n${this.$t("attention")}\n${this.$t("price may change")} \n
+*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n${this.$t("baggage")} 🧳 ${
+            this.totalBaggage
+          } \n\n${this.$t("seat selection")}\n${this.mealTxt}\n${this.$t(
+            "attention"
+          )}\n${this.$t("price may change")} \n
 *⚠️${this.$t("restrictions")}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t(
             "change"
           )} ${this.changeFeeValue} ${this.$t("p. p.")}\n${this.$t("cancel")} ${
@@ -366,22 +367,8 @@ export default {
 *${this.$t("class of travel")} 💺*\n  ${this.$t(
             "compartment options"
           )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n${this.$t(
-            "attention"
-          )} \n${this.$t("price may change")} \n\n*⚠️${this.$t(
-            "restrictions"
-          )}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
-            this.changeFeeValue
-          } ${this.$t("p. p.")} \n${this.$t("cancel")} ${
-            this.data.prices["cancel fee"].cancelFee.value
-          }${this.selectedCurrency} ${this.$t("p. p.")} \n${this.$t(
-            "no show"
-          )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
-            "ticket issuance"
-          )}:*\n      *${this.$t(
-            this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}*  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
-            "farewell"
-          )}`;
+            "please pay again msg"
+          )} \n\n${this.$t("farewell")}`;
           break;
 
         default:
@@ -419,8 +406,9 @@ export default {
       } else if (this.selectedLang === "he") {
         switch (part) {
           case "opening":
-            return `${this.$t("flight desc")} ${this.allNamesTxt}\n${
-              this.journeyTxt
+            console.log(this.allNamesTxt);
+            return `${this.$t("flight desc")} *${this.journeyTxt}* ${
+              this.data.travelers.length > 1 ? `\nעם ${this.allNamesTxt}` : ""
             }\n\n${this.$t("please pay msg")} `;
           case "priceDetails":
             return `  ${this.data.prices.price[first].value}${
@@ -586,19 +574,32 @@ export default {
           }
         });
         return txt;
+      } else if (this.$i18n.locale === "he") {
+        this.data.travelers.forEach((traveler, idx) => {
+          if (idx === 0) return;
+          // * first traveler is the the "your" above
+          txt += `${this.capitalizeFirstLetter(traveler.name)}${
+            idx < this.data.travelers.length - 1 ? " & " : ""
+          }`;
+        });
+        txt = `*${txt}* `;
+        return txt;
       }
     },
     journeyTxt() {
       let txt = "";
       let uniqeDestinations;
       uniqeDestinations = this.data.journey.filter(
-        (item, idx, array) => array.indexOf(item) === idx
+        (item, idx, array) =>
+          this.firstDepart !== item && array.indexOf(item) === idx
       );
 
-      uniqeDestinations.forEach(
-        (place, idx) =>
-          (txt += `${place}${idx < uniqeDestinations.length - 1 ? ", " : ""}`)
-      );
+      uniqeDestinations.forEach((place, idx) => {
+        txt += `${this.$t(place)}${
+          idx < uniqeDestinations.length - 1 ? ", " : ""
+        }`;
+        console.log(this.$t(place));
+      });
       return txt;
     },
     airfareTxt() {
@@ -614,9 +615,32 @@ export default {
             fareDetailsTxt += `\n${this.$t(option)}\n`;
           }
         );
-        return introFamilyFareTxt + optionsFamilyFareTxt + fareDetailsTxt;
+        if (this.$i18n.locale === "he") {
+          return introFamilyFareTxt + fareDetailsTxt;
+        } else {
+          return (
+            introFamilyFareTxt +
+            optionsFamilyFareTxt +
+            fareDetailsTxt +
+            this.$t("attention") +
+            `${this.$t("price may change")} \n\n*⚠️${this.$t(
+              "restrictions"
+            )}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
+              this.changeFeeValue
+            } ${this.$t("p. p.")} \n${this.$t("cancel")} ${
+              this.data.prices["cancel fee"].cancelFee.value
+            }${this.selectedCurrency} ${this.$t("p. p.")} \n${this.$t(
+              "no show"
+            )} ${this.noShowValue} ${this.$t("p. p.")} \n*${this.$t(
+              "ticket issuance"
+            )}:*\n      *${this.$t(
+              this.data.prices["​ticket issuance"]["​ticket issuance"].selected
+            )}*`
+          );
+        }
+      } else {
+        return this.priceDetails;
       }
-      return this.priceDetails;
     },
     priceExplanationTxt() {
       return `${this.$t("trip explanation 1")} ${
@@ -628,7 +652,16 @@ export default {
       const numOfTicketingOptions =
         this.data.prices["multi tickets"].numOfTicketOptions.value;
       for (let num = 0; num < numOfTicketingOptions; num++) {
-        txt += `*${ORDER[num]} ${this.$t("ticket option details")} \n`;
+        if (this.$i18n.locale === "he") {
+          // ! check why not showen order
+          txt += `*כרטיס ${this.$t(ORDER[num])}*: ${this.$t(
+            "ticket option details"
+          )}\n`;
+        } else {
+          txt += `*${this.$t(ORDER[num])} ${this.$t(
+            "ticket option details"
+          )} \n`;
+        }
       }
       return txt;
     },
