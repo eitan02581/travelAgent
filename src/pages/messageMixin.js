@@ -102,8 +102,8 @@ const messageMixin = {
 
                     }
 
-                    txt += `\n${line.airline} - *${line.flightNumber}* \n${line.departAirport} ${line.departAirport === "Tel Aviv" ? "➡️ " : `(${line.departAirportCode}) ➡️ `
-                        }${line.destAirport} ${line.destAirport === "Tel Aviv" ? "" : `(${line.destAirportCode})`
+                    txt += `\n${line.airline} - *${line.flightNumber}* \n${this.$t(line.departAirport)} ${line.departAirport === "Tel Aviv" ? "➡️ " : `(${line.departAirportCode}) ➡️ `
+                        }${this.$t(line.destAirport)} ${line.destAirport === "Tel Aviv" ? "" : `(${line.destAirportCode})`
                         } \n${this.$t(`${line.flightClass}`)} \n ${this.$t("dpt.")} ${this.$t(
                             `${line.departDay}`
                         )}${this.getRightSpaceAlignment(
@@ -257,6 +257,21 @@ const messageMixin = {
                 case "ven":
                     return " ";
                 case "sam":
+                    return "";
+                // * fr
+                case "יום א":
+                    return "  ";
+                case "יום ב":
+                    return "  ";
+                case "יום ג":
+                    return "  ";
+                case "יום ד":
+                    return "  ";
+                case "יום ה":
+                    return " ";
+                case "יום ו":
+                    return "  ";
+                case "יום ש":
                     return "";
                 // * months
                 case "jan":

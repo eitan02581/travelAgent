@@ -254,19 +254,20 @@ export default {
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
       LANGS: LANGS,
-      selectedLang: "en",
+      selectedLang: "he",
       formStructure: FORM_STRUCTURE,
       selectedBagges: [],
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
-        smartAmadeusCode: "",
-        //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-        // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
-        //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+        smartAmadeusCode:
+          // "",
+          //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+          // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
+          `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
+        4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
+        5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
+        6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
         journey: [],
         classOfTravel: "",
         ...FORM_ITEMS,
@@ -291,10 +292,7 @@ export default {
       );
     },
     onPreview() {
-      let flightsTxt,
-        OtherDestTxt = "",
-        destTxt,
-        otherTravelers;
+      let flightsTxt, otherTravelers;
 
       this.data.journey = [];
       this.data.classOfTravel = "";
@@ -317,7 +315,7 @@ export default {
           )}\n\n*${this.$t("itinerary")}* ${
             this.data.details.itinerary.itinerary.selected
           } \n${flightsTxt} ${this.ticketingOptionsTxt}
-*${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
+*${this.$t("airline")}* (XX) ✈️\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
 *${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n ✅${this.$t(
             "baggage"
@@ -362,7 +360,9 @@ export default {
             "itinerary"
           )}* ${
             this.data.details.itinerary.itinerary.selected
-          } \n${flightsTxt} \n${this.$t("airline")}*\n  *xx*, *xx* & *xx*\n
+          } \n${flightsTxt} \n${this.$t(
+            "airline"
+          )}* (XX) ✈️\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t(
             "compartment options"
           )} \n\n*${this.$t("airfare")} 💲* \n${this.airfareTxt}\n${this.$t(
@@ -395,7 +395,7 @@ export default {
         this.whatsappMessage = this.whatsappMessage.replaceAll("p. p.", "");
       }
     },
-    getRelevantTxtStructure(part) {
+    getRelevantTxtStructure(part, first, second) {
       if (this.selectedLang === "en") {
         switch (part) {
           case "opening":
@@ -404,7 +404,7 @@ export default {
             }*\n\n${this.$t("please pay msg")} `;
 
           default:
-            return "___ need to complete ___";
+            return part;
         }
       } else if (this.selectedLang === "fr") {
         switch (part) {
@@ -414,7 +414,7 @@ export default {
             }\n\n${this.$t("please pay msg")} `;
 
           default:
-            return "___ need to complete ___";
+            return part;
         }
       } else if (this.selectedLang === "he") {
         switch (part) {
@@ -422,9 +422,13 @@ export default {
             return `${this.$t("flight desc")} ${this.allNamesTxt}\n${
               this.journeyTxt
             }\n\n${this.$t("please pay msg")} `;
+          case "priceDetails":
+            return `  ${this.data.prices.price[first].value}${
+              this.selectedCurrency
+            } * ${this.travelersTypeAmountMap[first]} ${this.$t(first)} \n`;
 
           default:
-            return "___ need to complete ___";
+            return part;
         }
       }
     },
@@ -537,12 +541,9 @@ export default {
       return this.data.details.baggage.baggage.selected.join(", ");
     },
     priceDetails() {
-      let priceTxt = ``,
-        passanger;
+      let priceTxt = ``;
       for (const key in this.travelersTypeAmountMap) {
-        priceTxt += `  ${this.data.prices.price[key].value}${
-          this.selectedCurrency
-        } x ${this.travelersTypeAmountMap[key]} ${this.$t(key)} \n`;
+        priceTxt += this.getRelevantTxtStructure("priceDetails", key);
       }
       priceTxt += `\n*${this.$t("total")}* ${this.totalPrice}${
         this.selectedCurrency

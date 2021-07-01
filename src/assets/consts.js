@@ -14,7 +14,7 @@ export const TRAVELER_TYPES = [
     { label: "infant", value: "infant", color: "pink" },
 ]
 export const CLASSES_TYPE_MAP = {
-    "Business Cl.": ["F", "C", "I", "D", "Z", "R", "X"],
+    "Business Cl.": ["F", "C", "I", "J", "D", "Z", "R", "X"],
     "Premium Eco Cl.": ["W", "Q", "B", "P", "A"],
     "Economy Cl.": ["Y", "M", "T", "K", "V", "S", "L", "H", "E", "N", "G", "O", "U",],
 }
