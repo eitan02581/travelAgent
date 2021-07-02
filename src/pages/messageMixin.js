@@ -107,7 +107,7 @@ const messageMixin = {
 
                     }
 
-                    txt += `\n${line.airline} - *${line.flightNumber}* \n${this.$t(line.departAirport)} ${line.departAirport === "Tel Aviv" ? `${this.directionEmoji} ` : `(${line.departAirportCode}) ${this.directionEmoji} `
+                    txt += `\n${this.prefixFlight}${line.airline} - *${line.flightNumber}* \n${this.$t(line.departAirport)} ${line.departAirport === "Tel Aviv" ? `${this.directionEmoji} ` : `(${line.departAirportCode}) ${this.directionEmoji} `
                         }${this.$t(line.destAirport)} ${line.destAirport === "Tel Aviv" ? "" : `(${line.destAirportCode})`
                         } \n${this.$t(`${this.$t(line.flightClass)}`)} \n ${this.$t("dpt.")} ${this.$t(
                             `${line.departDay}`
@@ -339,6 +339,9 @@ const messageMixin = {
     computed: {
         directionEmoji() {
             return this.$i18n.locale === "he" ? '⬅️' : '➡️'
+        },
+        prefixFlight() {
+            return this.$i18n.locale === "he" ? 'טיסת ' : ''
         }
     }
 }

@@ -261,9 +261,9 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         smartAmadeusCode:
-          "",
-          //   `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-          // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
+          // "",
+            `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+          3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
         // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
@@ -379,7 +379,7 @@ export default {
           `\n${this.$t("p. p. = per person")}`,
           ""
         );
-        this.whatsappMessage = this.whatsappMessage.replaceAll("p. p.", "");
+        this.whatsappMessage = this.whatsappMessage.replaceAll(this.$t('p. p.'), "");
       }
     },
     getRelevantTxtStructure(part, first, second) {
