@@ -226,6 +226,7 @@
         label="send"
       />
     </div>
+    <q-toggle v-model="darkMode" color="black" label="dark mode" />
   </q-page>
 </template>
 
@@ -244,6 +245,8 @@ import {
 } from "src/assets/consts.js";
 
 import messageMixin from "./messageMixin";
+import { LocalStorage } from "quasar";
+
 export default {
   mixins: [messageMixin],
   data() {
@@ -261,9 +264,9 @@ export default {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         smartAmadeusCode:
-          // "",
-            `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-          3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
+          "",
+          // `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
+          // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
         //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
         // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
         // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
@@ -275,10 +278,13 @@ export default {
       },
       previewTxt: "",
       whatsappMessage: "",
+      darkMode: false,
     };
   },
   created() {
     this.init();
+    this.darkMode = LocalStorage.getItem("darkMode");
+    this.$q.dark.set(this.darkMode);
   },
   methods: {
     onAddTraveler() {
@@ -319,7 +325,7 @@ export default {
 *${this.$t("airline")}* (XX) ✈️\n  *xx*, *xx* & *xx*\n
 *${this.$t("class of travel")} 💺*\n  ${this.$t("compartment options")} \n
 *${this.$t("airfare")} 💲* \n${this.airfareTxt}\n\n${this.$t("baggage")} 🧳 ${
-            this.totalBaggage
+            this.baggageList
           } \n\n${this.$t("seat selection")}\n${this.mealTxt}\n${this.$t(
             "attention"
           )}\n${this.$t("price may change")} \n
@@ -379,7 +385,16 @@ export default {
           `\n${this.$t("p. p. = per person")}`,
           ""
         );
-        this.whatsappMessage = this.whatsappMessage.replaceAll(this.$t('p. p.'), "");
+        this.whatsappMessage = this.whatsappMessage.replaceAll(
+          this.$t("p. p."),
+          ""
+        );
+      }
+      if (this.$i18n.locale === "he") {
+        this.whatsappMessage = this.whatsappMessage.replaceAll(
+          `\n${this.$t("p. p. = per person")}`,
+          ""
+        );
       }
     },
     getRelevantTxtStructure(part, first, second) {
@@ -406,7 +421,6 @@ export default {
       } else if (this.selectedLang === "he") {
         switch (part) {
           case "opening":
-            console.log(this.allNamesTxt);
             return `${this.$t("flight desc")} *${this.journeyTxt}* ${
               this.data.travelers.length > 1 ? `\nעם ${this.allNamesTxt}` : ""
             }\n\n${this.$t("please pay msg")} `;
@@ -525,8 +539,13 @@ export default {
           break;
       }
     },
-    totalBaggage() {
-      return this.data.details.baggage.baggage.selected.join(", ");
+    baggageList() {
+      return (
+        "\n " +
+        this.data.details.baggage.baggage.selected
+          .map((baggage) => this.$t(baggage))
+          .join(",\n ")
+      );
     },
     priceDetails() {
       let priceTxt = ``;
@@ -598,7 +617,6 @@ export default {
         txt += `${this.$t(place)}${
           idx < uniqeDestinations.length - 1 ? ", " : ""
         }`;
-        console.log(this.$t(place));
       });
       return txt;
     },
@@ -692,6 +710,12 @@ export default {
         this.data.prices["multi tickets"].numOfTicketOptions.value = 1;
       } else this.data.prices["multi tickets"].numOfTicketOptions.value = 0;
     },
+    darkMode: {
+      handler(state) {
+        this.$q.dark.set(state);
+        LocalStorage.set("darkMode", state);
+      },
+    },
   },
 };
 </script>
@@ -700,5 +724,11 @@ export default {
   height: 10px;
   border-radius: 2px;
   margin: 36px 0 !important;
+}
+
+body.body--dark {
+  h1,h2,h3,h4,h5,h6 {
+    color: white;
+  }
 }
 </style>

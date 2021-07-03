@@ -15,9 +15,16 @@
 // *default quasar vars
 $space-base: 12px !default;
 
+
 $primary: #00cb81;
 $secondary: #4d7abd;
-$accent: #ff7d7d;
+$accent: #ff7d7d; 
+
+body.body--dark {
+    --q-color-primary: #00cb81;
+    --q-color-secondary: #757575;
+    --q-color-accent: #ff7d7d;
+  }
 
 $dark: #1d1d1d;
 

@@ -3,7 +3,7 @@ export const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
 export const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
-export const ORDER = ['FIRST', 'SECOND', 'THIRD', 'FORTH', 'FIFTH']
+export const ORDER = ['FIRST', 'SECOND', 'THIRD', 'FORTH', 'FIFTH','SIXTH','SEVENTH']
 
 export const TRAVELER_TYPES = [
     { label: "adult", value: "adult", color: "primary" },
