@@ -226,7 +226,7 @@
         label="send"
       />
     </div>
-    <q-toggle v-model="darkMode" color="black" label="dark mode" />
+    <q-toggle v-model="darkMode" color="black" label="Dark mode" />
   </q-page>
 </template>
 
