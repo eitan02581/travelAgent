@@ -648,8 +648,8 @@ export default {
             introFamilyFareTxt +
             optionsFamilyFareTxt +
             fareDetailsTxt +
-            this.$t("attention") +
-            `${this.$t("price may change")} \n\n⚠️${this.$t(
+            
+            `\n${this.$t("attention")} \n${this.$t("price may change")} \n\n⚠️${this.$t(
               "restrictions"
             )}⚠️\n${this.$t("change")} ${
               this.changeFeeValue
