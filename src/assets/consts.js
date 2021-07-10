@@ -80,6 +80,7 @@ export const FORM_ITEMS = {
             "Change fees": {
                 options: [
                     { label: "Non Changeable", value: "Non Changeable" },
+                    { label: "Non Refundable", value: "Non Refundable" },
                     { label: "change fee - (+difference in fare)", value: "(+difference in fare)" },
                     { label: "change fee - Only permitted upon availability on Bonus Quota!", value: "Only permitted upon availability on Bonus Quota!" },
                 ],

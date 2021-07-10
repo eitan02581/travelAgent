@@ -329,7 +329,7 @@ export default {
           } \n\n${this.$t("seat selection")}\n${this.mealTxt}\n${this.$t(
             "attention"
           )}\n${this.$t("price may change")} \n
-*⚠️${this.$t("restrictions")}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t(
+⚠️${this.$t("restrictions")}⚠️ \n${this.$t(
             "change"
           )} ${this.changeFeeValue} ${this.$t("p. p.")}\n${this.$t("cancel")} ${
             this.data.prices["cancel fee"].cancelFee.value
@@ -339,7 +339,7 @@ export default {
             "ticket issuance"
           )}:*\n      *${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}*  \n\n${this.$t("please pay again msg")} \n\n${this.$t(
+          )}*\n${this.$t("p. p. = per person")} \n\n${this.$t("please pay again msg")} \n\n${this.$t(
             "farewell"
           )}`;
           break;
@@ -525,6 +525,8 @@ export default {
       switch (changeFeeSelection) {
         case "Non Changeable":
           return this.$t("Non Changeable");
+        case "Non Refundable":
+          return this.$t("Non Refundable");
         case "(+difference in fare)":
           return `${changeFeeValue}${this.selectedCurrency}\n       ${this.$t(
             "(+difference in fare)"
@@ -550,7 +552,13 @@ export default {
     priceDetails() {
       let priceTxt = ``;
       for (const key in this.travelersTypeAmountMap) {
-        priceTxt += this.getRelevantTxtStructure("priceDetails", key);
+         if (this.$i18n.locale === "he"){
+           priceTxt += this.getRelevantTxtStructure("priceDetails", key);
+         }else{
+           priceTxt += `  ${this.travelersTypeAmountMap[key]} ${this.$t(key)} * ${this.data.prices.price[key].value}${
+              this.selectedCurrency
+            } \n`
+         }
       }
       priceTxt += `\n*${this.$t("total")}* ${this.totalPrice}${
         this.selectedCurrency
@@ -641,9 +649,9 @@ export default {
             optionsFamilyFareTxt +
             fareDetailsTxt +
             this.$t("attention") +
-            `${this.$t("price may change")} \n\n*⚠️${this.$t(
+            `${this.$t("price may change")} \n\n⚠️${this.$t(
               "restrictions"
-            )}⚠️*\n${this.$t("p. p. = per person")} \n${this.$t("change")} ${
+            )}⚠️\n${this.$t("change")} ${
               this.changeFeeValue
             } ${this.$t("p. p.")} \n${this.$t("cancel")} ${
               this.data.prices["cancel fee"].cancelFee.value
@@ -653,7 +661,7 @@ export default {
               "ticket issuance"
             )}:*\n      *${this.$t(
               this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-            )}*`
+            )}* \n${this.$t("p. p. = per person")}`
           );
         }
       } else {
