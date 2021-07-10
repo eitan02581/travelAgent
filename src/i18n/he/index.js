@@ -56,7 +56,7 @@ export default {
   "details": "Details:",
   "compartment": "Compartment:",
   "none": "None",
-  "baggage": "כבודה",
+  "baggage": "✅כבודה",
   "meal": "Meal",
   "attention": "*לתשומת לבך:*❗",
   "total": "סה\"כ:",
