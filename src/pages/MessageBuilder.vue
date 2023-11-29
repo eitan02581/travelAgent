@@ -257,19 +257,18 @@ export default {
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
       LANGS: LANGS,
-      selectedLang: "he",
+      selectedLang: "en",
       formStructure: FORM_STRUCTURE,
       selectedBagges: [],
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
-        smartAmadeusCode:
-          // "",
-          `  2  DL 033 G 11DEC 1*LHRATL HK1  1550 2040  11DEC  E  DL/JNIPB5
-  3  DL2960 W 11DEC 1*ATLECP HK1  2300 2306  11DEC  E  DL/JNIPB5
-  4  DL2315 Z 17DEC 7*ECPATL HK1  0931 1140  17DEC  E  DL/JNIPB5
-  5  DL1384 Z 17DEC 7*ATLAUS HK1  1243 1413  17DEC  E  DL/JNIPB5
-  6  DL5934 Z 17DEC 7*AUSLHR HK1  1805 0920  18DEC  E  DL/JNIPB5`,
+        smartAmadeusCode: "",
+        //         `  2  DL 033 G 11DEC 1*LHRATL HK1  1550 2040  11DEC  E  DL/JNIPB5
+        // 3  DL2960 W 11DEC 1*ATLECP HK1  2300 2306  11DEC  E  DL/JNIPB5
+        // 4  DL2315 Z 17DEC 7*ECPATL HK1  0931 1140  17DEC  E  DL/JNIPB5
+        // 5  DL1384 Z 17DEC 7*ATLAUS HK1  1243 1413  17DEC  E  DL/JNIPB5
+        // 6  DL5934 Z 17DEC 7*AUSLHR HK1  1805 0920  18DEC  E  DL/JNIPB5`,
         journey: [],
         classOfTravel: "",
         firstDepart: null,
