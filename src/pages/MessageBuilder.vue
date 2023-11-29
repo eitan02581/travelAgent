@@ -144,8 +144,8 @@
               <q-input
                 v-if="
                   option.type === 'input' &&
-                  !option.hide &&
-                  checkIfDisplaySubInput(optionName)
+                    !option.hide &&
+                    checkIfDisplaySubInput(optionName)
                 "
                 class="q-mt-sm"
                 v-model.number="option.value"
@@ -159,7 +159,7 @@
               <q-select
                 v-else-if="
                   option.type === 'selectMultiple' &&
-                  checkIfDisplaySubInput(optionName)
+                    checkIfDisplaySubInput(optionName)
                 "
                 filled
                 :type="option.type"
@@ -241,7 +241,7 @@ import {
   NO_SHOW_FEE,
   NO_SHOW_PLUS_CHANGE_FEE,
   CHANGE_FEE,
-  ORDER,
+  ORDER
 } from "src/assets/consts.js";
 
 import messageMixin from "./messageMixin";
@@ -257,28 +257,27 @@ export default {
       TRAVELER_TYPES: TRAVELER_TYPES,
       CLASSES_TYPE_MAP: CLASSES_TYPE_MAP,
       LANGS: LANGS,
-      selectedLang: "en",
+      selectedLang: "he",
       formStructure: FORM_STRUCTURE,
       selectedBagges: [],
       data: {
         whatsappNumber: null,
         travelers: [{ name: "", type: "adult" }],
         smartAmadeusCode:
-          "",
-          // `2  LY 011 U 27JUN 7 TLVJFK HK1  1915 2355  27JUN  E  LY/VM99AX
-          // 3  LY 008 O 04JUL 7 JFKTLV HK1  2350 1720  05JUL  E  LY/VM99AX`,
-        //   `3  LY 333 D 04JUL 7 TLVBRU HK2  1415 1815  04JUL  E  LY/SFU3FR
-        // 4  A3 623 D 07JUL 3*BRUATH HK2  1925 2330  07JUL  E  A3/SFU3FR
-        // 5  A37104 D 08JUL 4*ATHSKG HK2  0655 0745  08JUL  E  A3/SFU3FR
-        // 6  LY 548 J 08JUL 4 SKGTLV HK2  2235 0055  09JUL  E  LY/SFU3FR`,
+          // "",
+          `  2  DL 033 G 11DEC 1*LHRATL HK1  1550 2040  11DEC  E  DL/JNIPB5
+  3  DL2960 W 11DEC 1*ATLECP HK1  2300 2306  11DEC  E  DL/JNIPB5
+  4  DL2315 Z 17DEC 7*ECPATL HK1  0931 1140  17DEC  E  DL/JNIPB5
+  5  DL1384 Z 17DEC 7*ATLAUS HK1  1243 1413  17DEC  E  DL/JNIPB5
+  6  DL5934 Z 17DEC 7*AUSLHR HK1  1805 0920  18DEC  E  DL/JNIPB5`,
         journey: [],
         classOfTravel: "",
         firstDepart: null,
-        ...FORM_ITEMS,
+        ...FORM_ITEMS
       },
       previewTxt: "",
       whatsappMessage: "",
-      darkMode: false,
+      darkMode: false
     };
   },
   created() {
@@ -290,7 +289,7 @@ export default {
     onAddTraveler() {
       this.data.travelers.push({
         name: "",
-        type: "adult",
+        type: "adult"
       });
     },
     onRemoveTraveler(idx) {
@@ -308,7 +307,7 @@ export default {
 
       otherTravelers = this.data.travelers
         .filter((traveler, idx) => idx !== 0)
-        .map((traveler) => this.capitalizeFirstLetter(traveler.name))
+        .map(traveler => this.capitalizeFirstLetter(traveler.name))
         .join(", ");
 
       // *${this.$t("prices")}:* \n${this.priceDetails} \n\n
@@ -329,9 +328,9 @@ export default {
           } \n\n${this.$t("seat selection")}\n${this.mealTxt}\n${this.$t(
             "attention"
           )}\n${this.$t("price may change")} \n
-⚠️${this.$t("restrictions")}⚠️ \n${this.$t(
-            "change"
-          )} ${this.changeFeeValue} ${this.$t("p. p.")}\n${this.$t("cancel")} ${
+⚠️${this.$t("restrictions")}⚠️ \n${this.$t("change")} ${
+            this.changeFeeValue
+          } ${this.$t("p. p.")}\n${this.$t("cancel")} ${
             this.data.prices["cancel fee"].cancelFee.value
           }${this.selectedCurrency} ${this.$t("p. p.")} \n${this.$t(
             "no show"
@@ -339,15 +338,15 @@ export default {
             "ticket issuance"
           )}:*\n      *${this.$t(
             this.data.prices["​ticket issuance"]["​ticket issuance"].selected
-          )}*\n${this.$t("p. p. = per person")} \n\n${this.$t("please pay again msg")} \n\n${this.$t(
-            "farewell"
-          )}`;
+          )}*\n${this.$t("p. p. = per person")} \n\n${this.$t(
+            "please pay again msg"
+          )} \n\n${this.$t("farewell")}`;
           break;
 
         case "Multi tickets":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
-          )}*, ${this.$t("shalom")} 
+          )}*, ${this.$t("shalom")}
         \n${this.getRelevantTxtStructure("opening")}\n\n${this.$t(
             "ticket explanation"
           )} \n\n*${this.$t("itinerary")}* ${
@@ -362,7 +361,7 @@ export default {
         case "Family fare":
           this.whatsappMessage = `*${this.capitalizeFirstLetter(
             this.data.travelers[0].name
-          )}*, ${this.$t("shalom")} 
+          )}*, ${this.$t("shalom")}
         \n${this.getRelevantTxtStructure("opening")}\n\n*${this.$t(
             "itinerary"
           )}* ${
@@ -435,8 +434,7 @@ export default {
       }
     },
     getAmountOfSpecificTraveler(travelerType) {
-      return this.data.travelers.filter((tr) => tr.type === travelerType)
-        .length;
+      return this.data.travelers.filter(tr => tr.type === travelerType).length;
     },
     checkIfDisplay(boxName, item) {
       const tempalteToShow = this.data[boxName][item].templatesToBeDisplayIn;
@@ -475,7 +473,7 @@ export default {
         default:
           return true;
       }
-    },
+    }
   },
   computed: {
     selectedCurrency() {
@@ -483,7 +481,7 @@ export default {
     },
     travelersTypeAmountMap() {
       let travelersTypeAmountMap = {};
-      this.data.travelers.forEach((traveler) => {
+      this.data.travelers.forEach(traveler => {
         if (travelersTypeAmountMap[traveler.type])
           ++travelersTypeAmountMap[traveler.type];
         else travelersTypeAmountMap[traveler.type] = 1;
@@ -507,8 +505,8 @@ export default {
           return this.data.prices["no show"][NO_SHOW_FEE].value;
         case NO_SHOW_PLUS_CHANGE_FEE:
           const noShowFee = this.data.prices["no show"][NO_SHOW_FEE].value;
-          const changeFee =
-            this.data.prices["no show"][NO_SHOW_PLUS_CHANGE_FEE].value;
+          const changeFee = this.data.prices["no show"][NO_SHOW_PLUS_CHANGE_FEE]
+            .value;
           return `${noShowFee}${this.selectedCurrency} + ${this.$t(
             "change fee"
           )}: ${changeFee}${this.selectedCurrency}`;
@@ -519,8 +517,8 @@ export default {
       }
     },
     changeFeeValue() {
-      const changeFeeSelection =
-        this.data.prices["Change fees"]["Change fees"].selected;
+      const changeFeeSelection = this.data.prices["Change fees"]["Change fees"]
+        .selected;
       const changeFeeValue = this.data.prices["Change fees"][CHANGE_FEE].value;
       switch (changeFeeSelection) {
         case "Non Changeable":
@@ -545,20 +543,20 @@ export default {
       return (
         "\n " +
         this.data.details.baggage.baggage.selected
-          .map((baggage) => this.$t(baggage))
+          .map(baggage => this.$t(baggage))
           .join(",\n ")
       );
     },
     priceDetails() {
       let priceTxt = ``;
       for (const key in this.travelersTypeAmountMap) {
-         if (this.$i18n.locale === "he"){
-           priceTxt += this.getRelevantTxtStructure("priceDetails", key);
-         }else{
-           priceTxt += `  ${this.travelersTypeAmountMap[key]} ${this.$t(key)} * ${this.data.prices.price[key].value}${
-              this.selectedCurrency
-            } \n`
-         }
+        if (this.$i18n.locale === "he") {
+          priceTxt += this.getRelevantTxtStructure("priceDetails", key);
+        } else {
+          priceTxt += `  ${this.travelersTypeAmountMap[key]} ${this.$t(
+            key
+          )} * ${this.data.prices.price[key].value}${this.selectedCurrency} \n`;
+        }
       }
       priceTxt += `\n*${this.$t("total")}* ${this.totalPrice}${
         this.selectedCurrency
@@ -570,7 +568,7 @@ export default {
       if (!selectedMeals.length) return "";
       else
         return `\n✅${this.$t("meal")} 🍴 ${selectedMeals.map(
-          (meal) => `\n${this.$t(meal)}`
+          meal => `\n${this.$t(meal)}`
         )}\n`;
     },
     allNamesTxt() {
@@ -648,10 +646,9 @@ export default {
             introFamilyFareTxt +
             optionsFamilyFareTxt +
             fareDetailsTxt +
-            
-            `\n${this.$t("attention")} \n${this.$t("price may change")} \n\n⚠️${this.$t(
-              "restrictions"
-            )}⚠️\n${this.$t("change")} ${
+            `\n${this.$t("attention")} \n${this.$t(
+              "price may change"
+            )} \n\n⚠️${this.$t("restrictions")}⚠️\n${this.$t("change")} ${
               this.changeFeeValue
             } ${this.$t("p. p.")} \n${this.$t("cancel")} ${
               this.data.prices["cancel fee"].cancelFee.value
@@ -675,8 +672,8 @@ export default {
     },
     ticketingOptionsTxt() {
       let txt = "";
-      const numOfTicketingOptions =
-        this.data.prices["multi tickets"].numOfTicketOptions.value;
+      const numOfTicketingOptions = this.data.prices["multi tickets"]
+        .numOfTicketOptions.value;
       for (let num = 0; num < numOfTicketingOptions; num++) {
         if (this.$i18n.locale === "he") {
           // ! check why not showen order
@@ -690,25 +687,25 @@ export default {
         }
       }
       return txt;
-    },
+    }
   },
   watch: {
     selectedLang: {
       handler(lang) {
         this.$i18n.locale = lang;
       },
-      immediate: true,
+      immediate: true
     },
     "data.travelers": {
       handler(travelers) {
         for (const key in this.data.prices.price) {
-          if (travelers.filter((traveler) => traveler.type === key).length) {
+          if (travelers.filter(traveler => traveler.type === key).length) {
             this.data.prices.price[key].hide = false;
           } else this.data.prices.price[key].hide = true;
         }
       },
       deep: true,
-      immediate: true,
+      immediate: true
     },
     selectedTemplateTab(tab) {
       if (tab === "Family fare") {
@@ -722,9 +719,9 @@ export default {
       handler(state) {
         this.$q.dark.set(state);
         LocalStorage.set("darkMode", state);
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -735,7 +732,12 @@ export default {
 }
 
 body.body--dark {
-  h1,h2,h3,h4,h5,h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: white;
   }
 }
